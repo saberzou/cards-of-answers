@@ -531,8 +531,6 @@ function createPath(type) {
   svg.appendChild(path);
   pathEl = path;
   pathLength = path.getTotalLength();
-  // Rebuild screen-space path on next frame (after layout)
-  requestAnimationFrame(buildScreenPath);
   return path;
 }
 
@@ -664,6 +662,10 @@ function switchPath(type) {
   config = getConfig();
   buildCards();
   createPath(type);
+  // Wait for layout then build screen path and start animations
+  requestAnimationFrame(() => {
+    buildScreenPath();
+  });
 
   document.querySelectorAll('.path-btn').forEach(b => b.classList.remove('active'));
   document.querySelector(`[data-path="${type}"]`).classList.add('active');
@@ -879,13 +881,12 @@ let resizeTimer;
 function onResize() {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
-    const newConfig = getConfig();
-    if (newConfig.cardCount !== config.cardCount) {
-      buildCards();
-    }
-    config = newConfig;
+    config = getConfig();
+    buildCards();
     createPath(currentPath);
-    positionCards();
+    requestAnimationFrame(() => {
+      buildScreenPath();
+    });
   }, 200);
 }
 
@@ -893,7 +894,10 @@ function init() {
   buildCards();
   createPath(currentPath);
   initSnow();
-  animate();
+  // Wait for layout then start card animations
+  requestAnimationFrame(() => {
+    buildScreenPath();
+  });
   window.addEventListener('resize', onResize);
 }
 
