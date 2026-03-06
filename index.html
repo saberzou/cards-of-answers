@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cards of Answers</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8d48b;
+    --gold-dark: #8b6914;
+    --bg: #0a0a0f;
+    --card-w: 140px;
+    --card-h: 200px;
+  }
+
+  body {
+    background: var(--bg);
+    color: #e8e0d0;
+    font-family: 'Cormorant Garamond', serif;
+    overflow: hidden;
+    height: 100dvh;
+    width: 100vw;
+    cursor: default;
+    user-select: none;
+  }
+
+  /* --- Header --- */
+  .header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 24px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+  }
+  .header > * { pointer-events: auto; }
+  .logo {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .path-switcher {
+    display: flex;
+    gap: 4px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 4px;
+  }
+  .path-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    background: transparent;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .path-btn:hover { color: rgba(255,255,255,0.7); }
+  .path-btn.active {
+    background: rgba(201,168,76,0.15);
+    color: var(--gold);
+  }
+
+  /* --- Prompt --- */
+  .prompt {
+    position: fixed;
+    bottom: 48px;
+    left: 50%; transform: translateX(-50%);
+    z-index: 100;
+    text-align: center;
+    pointer-events: none;
+  }
+  .prompt-text {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold);
+    opacity: 0.6;
+    animation: breathe 3s ease-in-out infinite;
+  }
+  @keyframes breathe {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+  }
+
+  /* --- Canvas area --- */
+  .marquee-container {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* SVG paths (invisible, used for offset-path) */
+  .path-svg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  /* --- Cards --- */
+  .card-track {
+    position: absolute;
+    inset: 0;
+  }
+  .card-wrapper {
+    position: absolute;
+    width: var(--card-w);
+    height: var(--card-h);
+    offset-rotate: auto;
+    will-change: offset-distance, transform;
+    cursor: pointer;
+    perspective: 600px;
+    transition: filter 0.3s;
+  }
+  .card-wrapper:hover {
+    filter: brightness(1.2) drop-shadow(0 0 20px rgba(201,168,76,0.3));
+    z-index: 10;
+  }
+  .card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .card-wrapper.flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  /* Card back — ornate mystical design */
+  .card-back {
+    background: linear-gradient(145deg, #1a1520, #0d0b12);
+    border: 1.5px solid var(--gold-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .card-back::before {
+    content: '';
+    position: absolute;
+    inset: 6px;
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 7px;
+  }
+  .card-back::after {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border: 1px solid rgba(201,168,76,0.1);
+    border-radius: 5px;
+  }
+  .card-symbol {
+    font-size: 48px;
+    color: var(--gold);
+    opacity: 0.7;
+    filter: drop-shadow(0 0 8px rgba(201,168,76,0.3));
+    z-index: 1;
+  }
+  .card-corner {
+    position: absolute;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    color: var(--gold-dark);
+    opacity: 0.5;
+  }
+  .card-corner.tl { top: 14px; left: 14px; }
+  .card-corner.br { bottom: 14px; right: 14px; transform: rotate(180deg); }
+
+  /* Card front — answer side */
+  .card-front {
+    background: linear-gradient(145deg, #f5f0e8, #e8dfd0);
+    border: 1.5px solid var(--gold);
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 16px;
+    color: #1a1520;
+  }
+  .card-category {
+    font-family: 'Cinzel', serif;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+    margin-bottom: 12px;
+  }
+  .card-answer {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    text-align: center;
+    color: #1a1520;
+    font-style: italic;
+  }
+  .card-number {
+    position: absolute;
+    bottom: 12px;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    color: var(--gold-dark);
+    opacity: 0.5;
+  }
+
+  /* --- Pulled card overlay --- */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+  .overlay.active {
+    pointer-events: auto;
+    opacity: 1;
+  }
+  .overlay-bg {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(12px);
+  }
+  .overlay-card {
+    position: relative;
+    z-index: 1;
+    width: 260px;
+    height: 380px;
+    perspective: 1000px;
+    cursor: pointer;
+  }
+  .overlay-card .card-inner {
+    width: 100%;
+    height: 100%;
+  }
+  .overlay-card .card-answer {
+    font-size: 20px;
+    line-height: 1.6;
+  }
+  .overlay-card .card-category {
+    font-size: 10px;
+    margin-bottom: 16px;
+  }
+  .overlay-card .card-symbol { font-size: 72px; }
+  .overlay-card .card-corner { font-size: 14px; }
+  .overlay-card .card-corner.tl { top: 18px; left: 18px; }
+  .overlay-card .card-corner.br { bottom: 18px; right: 18px; }
+  .overlay-card .card-back::before { inset: 10px; }
+  .overlay-card .card-back::after { inset: 18px; }
+  .overlay-card .card-number { font-size: 11px; bottom: 16px; }
+  .overlay-card .card-front { padding: 32px 24px; }
+
+  .overlay-hint {
+    position: absolute;
+    bottom: 60px;
+    left: 50%; transform: translateX(-50%);
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.3);
+    z-index: 1;
+  }
+
+  /* Ambient particles */
+  .particle {
+    position: fixed;
+    width: 2px; height: 2px;
+    background: var(--gold);
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    animation: float-up linear infinite;
+  }
+  @keyframes float-up {
+    0% { opacity: 0; transform: translateY(0) scale(0); }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.1; }
+    100% { opacity: 0; transform: translateY(-200px) scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">Cards of Answers</div>
+  <div class="path-switcher">
+    <button class="path-btn active" data-path="loop">Loop</button>
+    <button class="path-btn" data-path="wave">Wave</button>
+    <button class="path-btn" data-path="curly">Curly</button>
+    <button class="path-btn" data-path="stream">Stream</button>
+  </div>
+</div>
+
+<div class="prompt">
+  <div class="prompt-text">Draw a card for your answer</div>
+</div>
+
+<div class="marquee-container">
+  <svg class="path-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" id="pathSvg">
+    <!-- Paths defined in JS -->
+  </svg>
+  <div class="card-track" id="cardTrack"></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-bg" id="overlayBg"></div>
+  <div class="overlay-card" id="overlayCard"></div>
+  <div class="overlay-hint">tap to flip · click outside to close</div>
+</div>
+
+<script>
+// --- Answers ---
+const ANSWERS = [
+  { category: "Courage", answer: "The thing you fear most is exactly what you must do.", symbol: "♠" },
+  { category: "Patience", answer: "Not yet. But soon.", symbol: "♣" },
+  { category: "Truth", answer: "You already know the answer. Trust it.", symbol: "♦" },
+  { category: "Change", answer: "What you're holding onto is holding you back.", symbol: "♥" },
+  { category: "Love", answer: "Open the door you keep pretending is locked.", symbol: "♥" },
+  { category: "Action", answer: "Stop planning. Start.", symbol: "♠" },
+  { category: "Wisdom", answer: "The teacher appears when the student is ready.", symbol: "♣" },
+  { category: "Solitude", answer: "Being alone is not the same as being lonely.", symbol: "♦" },
+  { category: "Fate", answer: "This was always going to happen.", symbol: "♠" },
+  { category: "Hope", answer: "The darkest hour is just before dawn.", symbol: "♥" },
+  { category: "Doubt", answer: "Your doubt is not protecting you — it is limiting you.", symbol: "♣" },
+  { category: "Growth", answer: "Discomfort is the price of a meaningful life.", symbol: "♦" },
+  { category: "Time", answer: "It's not too late. It's never too late.", symbol: "♠" },
+  { category: "Joy", answer: "Happiness is not found. It is created.", symbol: "♥" },
+  { category: "Focus", answer: "Do less. But do it completely.", symbol: "♣" },
+  { category: "Release", answer: "Forgive them. Not for them — for you.", symbol: "♦" },
+  { category: "Risk", answer: "The biggest risk is not taking one.", symbol: "♠" },
+  { category: "Rest", answer: "You are not lazy. You are exhausted. Rest.", symbol: "♥" },
+  { category: "Connection", answer: "Call the person you've been thinking about.", symbol: "♣" },
+  { category: "Clarity", answer: "Simplify. Then simplify again.", symbol: "♦" },
+  { category: "Acceptance", answer: "Let it be what it is.", symbol: "♥" },
+  { category: "Ambition", answer: "Dream bigger. You're playing too small.", symbol: "♠" },
+  { category: "Gratitude", answer: "Look at what you have. Really look.", symbol: "♣" },
+  { category: "Mystery", answer: "Not everything needs to be understood.", symbol: "♦" },
+];
+
+const SYMBOLS = ["✦", "◈", "✧", "⬥", "❖", "☽", "✶", "⊕"];
+const CARD_COUNT = 18;
+
+// --- SVG Path definitions ---
+const PATHS = {
+  loop: (w, h) => {
+    const cx = w / 2, cy = h / 2, rx = w * 0.3, ry = h * 0.32;
+    return `M ${cx - rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx + rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx - rx} ${cy}`;
+  },
+  wave: (w, h) => {
+    const amp = h * 0.2, mid = h / 2;
+    const seg = w / 4;
+    return `M ${-w * 0.15} ${mid} C ${seg * 0.5} ${mid - amp} ${seg} ${mid - amp} ${seg * 1.5} ${mid} C ${seg * 2} ${mid + amp} ${seg * 2.5} ${mid + amp} ${seg * 3} ${mid} C ${seg * 3.5} ${mid - amp} ${seg * 4} ${mid - amp} ${w * 1.15} ${mid}`;
+  },
+  curly: (w, h) => {
+    const cx = w / 2, cy = h / 2;
+    // Lemniscate / figure-8
+    const sx = w * 0.35, sy = h * 0.3;
+    return `M ${cx} ${cy} C ${cx + sx * 0.5} ${cy - sy} ${cx + sx} ${cy - sy * 0.4} ${cx + sx * 0.6} ${cy} C ${cx + sx * 0.2} ${cy + sy * 0.4} ${cx + sx * 0.3} ${cy + sy} ${cx} ${cy} C ${cx - sx * 0.3} ${cy - sy} ${cx - sx * 0.2} ${cy - sy * 0.4} ${cx - sx * 0.6} ${cy} C ${cx - sx} ${cy + sy * 0.4} ${cx - sx * 0.5} ${cy + sy} ${cx} ${cy}`;
+  },
+  stream: (w, h) => {
+    const y = h / 2;
+    return `M ${-w * 0.1} ${y} L ${w * 1.1} ${y}`;
+  }
+};
+
+let currentPath = 'loop';
+let animId = null;
+let cards = [];
+let pathEl = null;
+let pathLength = 0;
+let speed = 0.08; // % per frame (~60fps)
+let offsets = []; // each card's current offset-distance %
+
+// --- Create SVG path ---
+function createPath(type) {
+  const svg = document.getElementById('pathSvg');
+  const vw = 1600, vh = 900;
+  svg.innerHTML = '';
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('d', PATHS[type](vw, vh));
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', 'none');
+  path.id = 'motionPath';
+  svg.appendChild(path);
+  pathEl = path;
+  pathLength = path.getTotalLength();
+  return path;
+}
+
+// --- Get CSS path string ---
+function getCSSPath(type) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  return PATHS[type](vw, vh);
+}
+
+// --- Create card DOM ---
+function createCardEl(index) {
+  const answer = ANSWERS[index % ANSWERS.length];
+  const sym = SYMBOLS[index % SYMBOLS.length];
+  const num = String(index + 1).padStart(2, '0');
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'card-wrapper';
+  wrapper.dataset.index = index;
+
+  wrapper.innerHTML = `
+    <div class="card-inner">
+      <div class="card-face card-back">
+        <span class="card-corner tl">${answer.symbol}</span>
+        <span class="card-symbol">${sym}</span>
+        <span class="card-corner br">${answer.symbol}</span>
+      </div>
+      <div class="card-face card-front">
+        <span class="card-category">${answer.category}</span>
+        <span class="card-answer">"${answer.answer}"</span>
+        <span class="card-number">${num}</span>
+      </div>
+    </div>
+  `;
+
+  wrapper.addEventListener('click', () => openCard(index));
+  return wrapper;
+}
+
+// --- Build cards ---
+function buildCards() {
+  const track = document.getElementById('cardTrack');
+  track.innerHTML = '';
+  cards = [];
+  offsets = [];
+
+  for (let i = 0; i < CARD_COUNT; i++) {
+    const el = createCardEl(i);
+    track.appendChild(el);
+    cards.push(el);
+    offsets.push((i / CARD_COUNT) * 100);
+  }
+}
+
+// --- Position cards along path ---
+function positionCards() {
+  if (!pathEl) return;
+  const svg = document.getElementById('pathSvg');
+  const svgRect = svg.getBoundingClientRect();
+  const vbW = 1600, vbH = 900;
+  const scaleX = svgRect.width / vbW;
+  const scaleY = svgRect.height / vbH;
+  const offX = svgRect.left;
+  const offY = svgRect.top;
+  const isOpen = currentPath === 'wave' || currentPath === 'stream';
+
+  for (let i = 0; i < cards.length; i++) {
+    let pct = offsets[i] % 100;
+    if (pct < 0) pct += 100;
+
+    // For open paths, hide cards that go past the end
+    if (isOpen && (pct > 99.5 || pct < 0.5)) {
+      cards[i].style.opacity = '0';
+    } else {
+      cards[i].style.opacity = '1';
+    }
+
+    const dist = (pct / 100) * pathLength;
+    const pt = pathEl.getPointAtLength(dist);
+
+    // Tangent for rotation
+    const dt = 0.5;
+    const pt2 = pathEl.getPointAtLength(Math.min(dist + dt, pathLength));
+    const angle = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * (180 / Math.PI);
+
+    const x = pt.x * scaleX + offX;
+    const y = pt.y * scaleY + offY;
+
+    cards[i].style.transform = `translate(${x - 70}px, ${y - 100}px) rotate(${angle}deg)`;
+  }
+}
+
+// --- Animation loop ---
+function animate() {
+  const isOpen = currentPath === 'wave' || currentPath === 'stream';
+
+  for (let i = 0; i < offsets.length; i++) {
+    offsets[i] += speed;
+    if (!isOpen) {
+      if (offsets[i] >= 100) offsets[i] -= 100;
+    } else {
+      // Loop: reset to beginning for open paths
+      if (offsets[i] > 110) offsets[i] -= 130;
+    }
+  }
+
+  positionCards();
+  animId = requestAnimationFrame(animate);
+}
+
+// --- Switch path ---
+function switchPath(type) {
+  currentPath = type;
+  createPath(type);
+
+  // Re-spread cards evenly
+  for (let i = 0; i < offsets.length; i++) {
+    offsets[i] = (i / CARD_COUNT) * 100;
+  }
+
+  document.querySelectorAll('.path-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-path="${type}"]`).classList.add('active');
+}
+
+// --- Overlay: open card ---
+function openCard(index) {
+  const answer = ANSWERS[index % ANSWERS.length];
+  const sym = SYMBOLS[index % SYMBOLS.length];
+  const num = String(index + 1).padStart(2, '0');
+  const overlay = document.getElementById('overlay');
+  const overlayCard = document.getElementById('overlayCard');
+
+  overlayCard.innerHTML = `
+    <div class="card-inner">
+      <div class="card-face card-back">
+        <span class="card-corner tl">${answer.symbol}</span>
+        <span class="card-symbol">${sym}</span>
+        <span class="card-corner br">${answer.symbol}</span>
+      </div>
+      <div class="card-face card-front">
+        <span class="card-category">${answer.category}</span>
+        <span class="card-answer">"${answer.answer}"</span>
+        <span class="card-number">${num}</span>
+      </div>
+    </div>
+  `;
+
+  overlay.classList.add('active');
+
+  // Flip after short delay
+  setTimeout(() => {
+    overlayCard.querySelector('.card-inner').style.transform = 'rotateY(180deg)';
+    overlayCard.querySelector('.card-inner').style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+  }, 400);
+
+  // Toggle flip on click
+  overlayCard.onclick = (e) => {
+    e.stopPropagation();
+    const inner = overlayCard.querySelector('.card-inner');
+    const isFlipped = inner.style.transform === 'rotateY(180deg)';
+    inner.style.transform = isFlipped ? 'rotateY(0deg)' : 'rotateY(180deg)';
+  };
+}
+
+function closeOverlay() {
+  const overlay = document.getElementById('overlay');
+  overlay.classList.remove('active');
+}
+
+document.getElementById('overlayBg').addEventListener('click', closeOverlay);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+
+// --- Path switcher ---
+document.querySelectorAll('.path-btn').forEach(btn => {
+  btn.addEventListener('click', () => switchPath(btn.dataset.path));
+});
+
+// --- Ambient particles ---
+function spawnParticles() {
+  const body = document.body;
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top = 60 + Math.random() * 40 + 'vh';
+    p.style.animationDuration = 4 + Math.random() * 6 + 's';
+    p.style.animationDelay = Math.random() * 8 + 's';
+    p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
+    body.appendChild(p);
+  }
+}
+
+// --- Resize handler ---
+function onResize() {
+  createPath(currentPath);
+  positionCards();
+}
+
+// --- Init ---
+function init() {
+  buildCards();
+  createPath(currentPath);
+  spawnParticles();
+  animate();
+  window.addEventListener('resize', onResize);
+}
+
+init();
+</script>
+</body>
+</html>
