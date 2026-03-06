@@ -490,7 +490,7 @@ const PATHS = {
     // Codrops exact path scaled to viewport center
     // Original in 588x187: M0 186 C138.5 186 305.5 194 305.5 49 C305.5 -113 -75 186 484.5 186 H587
     // Scale to fit ~80% of width, centered vertically
-    const pw = w * 1.3, ph = pw * (187 / 588); // wider for rounder loop
+    const pw = w * 2.6, ph = pw * (187 / 588); // much wider for rounder loop
     const ox = (w - pw) / 2; // centered (overflows both sides)
     const oy = (h - ph) / 2 + ph * 0.25;
     const sx = pw / 588, sy = ph / 187;
