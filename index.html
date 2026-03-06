@@ -626,57 +626,84 @@ function buildScreenPath() {
   for (let i = 0; i < cards.length; i++) {
     cards[i].style.offsetPath = pathCSS;
   }
-  startAnimations();
+  // Initialize offsets evenly
+  for (let i = 0; i < cards.length; i++) {
+    offsets[i] = (i / cards.length) * 100;
+  }
+  startMarquee();
 }
 
-let cardAnimations = [];
+// --- Spring-based hover slowdown ---
+let hoverTarget = 1;       // 1 = normal, 0.15 = slowed
+let hoverFactor = 1;       // current smoothed value
+const hoverStiffness = 4;  // spring-like smoothing speed
 
-function startAnimations() {
-  // Cancel any existing animations
-  cardAnimations.forEach(a => a.cancel());
-  cardAnimations = [];
+let isHovering = false;
+let marqueeRAF = null;
 
-  if (!screenPathD) return;
+function wrap(min, max, v) {
+  const range = max - min;
+  return (((v - min) % range + range) % range) + min;
+}
 
-  // Total loop duration in ms — controls speed
-  const duration = 60000;
+// Opacity curve: fade at path edges — f(x) = (1 − |2x − 1|^6)^2
+function edgeOpacity(pct) {
+  const x = 2 * (pct / 100) - 1;
+  return Math.pow(1 - Math.pow(Math.abs(x), 6), 2);
+}
 
-  for (let i = 0; i < cards.length; i++) {
-    const startPct = (i / cards.length) * 100;
-    // Web Animations API — runs on compositor thread, no jank
-    const anim = cards[i].animate(
-      [
-        { offsetDistance: `${startPct}%` },
-        { offsetDistance: `${startPct + 100}%` }
-      ],
-      {
-        duration: duration,
-        iterations: Infinity,
-        easing: 'linear'
-      }
-    );
-    cardAnimations.push(anim);
-  }
+function startMarquee() {
+  if (marqueeRAF) cancelAnimationFrame(marqueeRAF);
 
-  // Desktop hover: slow down when hovering individual cards
+  // Desktop hover listeners
   if (window.innerWidth > 768) {
     cards.forEach(card => {
-      card.addEventListener('mouseenter', () => {
-        cardAnimations.forEach(a => { a.playbackRate = 0.15; });
-      });
-      card.addEventListener('mouseleave', () => {
-        cardAnimations.forEach(a => { a.playbackRate = 1; });
-      });
+      card.addEventListener('mouseenter', () => { isHovering = true; });
+      card.addEventListener('mouseleave', () => { isHovering = false; });
     });
   }
+
+  let lastTime = performance.now();
+  const baseVelocity = 100 / 60; // ~100% per 60s = same speed as before
+
+  function tick(now) {
+    const delta = (now - lastTime) / 1000;
+    lastTime = now;
+
+    // Smooth hover factor (spring-like lerp)
+    hoverTarget = isHovering ? 0.15 : 1;
+    hoverFactor += (hoverTarget - hoverFactor) * Math.min(1, hoverStiffness * delta);
+
+    const moveBy = baseVelocity * delta * hoverFactor;
+
+    for (let i = 0; i < cards.length; i++) {
+      offsets[i] = wrap(0, 100, offsets[i] + moveBy);
+      cards[i].style.offsetDistance = `${offsets[i]}%`;
+
+      // Z-index: higher progress = higher z-index (fixes crossing overlap)
+      cards[i].style.zIndex = Math.floor(offsets[i]);
+
+      // Edge opacity fade
+      cards[i].style.opacity = edgeOpacity(offsets[i]);
+    }
+
+    marqueeRAF = requestAnimationFrame(tick);
+  }
+
+  marqueeRAF = requestAnimationFrame(tick);
 }
 
 function positionCards() {
-  // No-op: animations handle positioning now
+  // Called on init before marquee starts
+  for (let i = 0; i < cards.length; i++) {
+    let pct = offsets[i] % 100;
+    if (pct < 0) pct += 100;
+    cards[i].style.offsetDistance = `${pct}%`;
+  }
 }
 
 function animate() {
-  // No-op: Web Animations API handles everything
+  // No-op — marquee tick handles everything
 }
 
 function switchPath(type) {
