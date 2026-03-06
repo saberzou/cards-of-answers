@@ -483,8 +483,9 @@ const PATHS = {
   },
   wave: (w, h) => {
     const amp = h * 0.2, mid = h / 2;
-    const seg = w / 4;
-    return `M ${-w * 0.15} ${mid} C ${seg * 0.5} ${mid - amp} ${seg} ${mid - amp} ${seg * 1.5} ${mid} C ${seg * 2} ${mid + amp} ${seg * 2.5} ${mid + amp} ${seg * 3} ${mid} C ${seg * 3.5} ${mid - amp} ${seg * 4} ${mid - amp} ${w * 1.15} ${mid}`;
+    const s = w / 4;
+    // Closed wave: top half goes right, bottom half returns left
+    return `M 0 ${mid} C ${s * 0.5} ${mid - amp} ${s} ${mid - amp} ${s * 1.5} ${mid} C ${s * 2} ${mid + amp} ${s * 2.5} ${mid + amp} ${s * 3} ${mid} C ${s * 3.5} ${mid - amp} ${s * 4} ${mid - amp} ${w} ${mid} C ${w - s * 0.5} ${mid + amp} ${w - s} ${mid + amp} ${w - s * 1.5} ${mid} C ${w - s * 2} ${mid - amp} ${w - s * 2.5} ${mid - amp} ${w - s * 3} ${mid} C ${w - s * 3.5} ${mid + amp} ${w - s * 4} ${mid + amp} 0 ${mid}`;
   },
   curly: (w, h) => {
     const cx = w / 2, cy = h / 2;
@@ -574,7 +575,7 @@ function positionCards() {
   const scaleY = svgRect.height / vbH;
   const offX = svgRect.left;
   const offY = svgRect.top;
-  const isOpen = currentPath === 'wave';
+  const isOpen = false; // wave is now closed
   const cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
   const ch = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
 
@@ -603,7 +604,7 @@ function positionCards() {
 }
 
 function animate() {
-  const isOpen = currentPath === 'wave';
+  const isOpen = false; // wave is now closed
 
   for (let i = 0; i < offsets.length; i++) {
     offsets[i] += config.speed;
