@@ -477,8 +477,16 @@ let config = getConfig();
 const PATHS = {
   loop: (w, h) => {
     const cx = w / 2, cy = h / 2;
-    const r = Math.min(w, h) * (window.innerWidth <= 768 ? 0.38 : 0.35);
-    return `M ${cx - r} ${cy} A ${r} ${r} 0 1 1 ${cx + r} ${cy} A ${r} ${r} 0 1 1 ${cx - r} ${cy}`;
+    const isMobile = window.innerWidth <= 768;
+    // Make a perfect circle on screen by compensating for viewBox aspect ratio distortion
+    // viewBox is 1600x900 but screen has different ratio; positionCards uses separate scaleX/scaleY
+    const screenR = isMobile ? 160 : 280; // desired radius in screen pixels
+    const svgRect = document.getElementById('pathSvg').getBoundingClientRect();
+    const scaleX = svgRect.width / w;
+    const scaleY = svgRect.height / h;
+    const rx = screenR / scaleX;
+    const ry = screenR / scaleY;
+    return `M ${cx - rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx + rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx - rx} ${cy}`;
   },
   wave: (w, h) => {
     const amp = h * 0.12, mid = h / 2;
