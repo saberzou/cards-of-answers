@@ -694,8 +694,9 @@ function startMarquee() {
       offsets[i] = wrap(0, 100, offsets[i] + moveBy);
       cards[i].style.offsetDistance = `${offsets[i]}%`;
 
-      // Z-index: higher progress = higher z-index (fixes crossing overlap)
-      cards[i].style.zIndex = Math.floor(offsets[i]);
+      // Z-index: use screen Y position so crossing overlaps look natural
+      const rect = cards[i].getBoundingClientRect();
+      cards[i].style.zIndex = Math.floor(rect.top);
     }
 
     marqueeRAF = requestAnimationFrame(tick);
