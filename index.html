@@ -487,13 +487,12 @@ let config = null;
 
 const PATHS = {
   loop: (w, h) => {
-    // Codrops-style: open self-crossing path from left edge to right edge
-    // Original: M0 186 C138.5 186 305.5 194 305.5 49 C305.5 -113 -75 186 484.5 186 H587 (in 588x187 viewBox)
-    // Scaled to our 1600x900 viewBox
-    const sx = w / 588, sy = h / 187;
-    const my = h * 0.55; // vertical center offset
-    const oy = my - 186 * sy; // shift to center vertically
-    return `M 0 ${186 * sy + oy} C ${138.5 * sx} ${186 * sy + oy} ${305.5 * sx} ${194 * sy + oy} ${305.5 * sx} ${49 * sy + oy} C ${305.5 * sx} ${-113 * sy + oy} ${-75 * sx} ${186 * sy + oy} ${484.5 * sx} ${186 * sy + oy} L ${w} ${186 * sy + oy}`;
+    // Open self-crossing path: left → cross → circle → cross → right
+    const cx = w / 2, cy = h * 0.5;
+    const r = h * 0.3; // circle radius in SVG coords
+    // Entry/exit y position
+    const ey = cy + r * 0.3;
+    return `M 0 ${ey} C ${cx * 0.5} ${ey} ${cx - r * 1.2} ${cy + r * 1.4} ${cx} ${cy + r} A ${r} ${r} 0 1 1 ${cx} ${cy + r - 0.01} C ${cx + r * 1.2} ${cy + r * 1.4} ${cx * 1.5} ${ey} ${w} ${ey}`;
   },
   wave: (w, h) => {
     const amp = h * 0.12, mid = h / 2;
