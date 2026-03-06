@@ -515,6 +515,7 @@ let cards = [];
 let pathEl = null;
 let pathLength = 0;
 let offsets = [];
+let prevAngles = [];
 
 function createPath(type) {
   const svg = document.getElementById('pathSvg');
@@ -564,6 +565,7 @@ function buildCards() {
   track.innerHTML = '';
   cards = [];
   offsets = [];
+  prevAngles = [];
   config = getConfig();
 
   for (let i = 0; i < config.cardCount; i++) {
@@ -571,6 +573,7 @@ function buildCards() {
     track.appendChild(el);
     cards.push(el);
     offsets.push((i / config.cardCount) * 100);
+    prevAngles.push(null);
   }
 }
 
@@ -593,14 +596,28 @@ function positionCards() {
     const dist = (pct / 100) * pathLength;
     const pt = pathEl.getPointAtLength(dist);
 
-    const dt = 0.5;
-    const pt2 = pathEl.getPointAtLength(Math.min(dist + dt, pathLength));
-    const angle = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * (180 / Math.PI);
+    // Wider tangent sampling for smoother angle
+    const dt = pathLength * 0.005;
+    const d1 = Math.max(0, dist - dt);
+    const d2 = Math.min(pathLength, dist + dt);
+    const p1 = pathEl.getPointAtLength(d1);
+    const p2 = pathEl.getPointAtLength(d2);
+    let rawAngle = Math.atan2(p2.y - p1.y, p2.x - p1.x) * (180 / Math.PI);
+
+    // Smooth angle transitions — lerp from previous frame
+    if (prevAngles[i] !== null) {
+      let diff = rawAngle - prevAngles[i];
+      // Normalize to [-180, 180]
+      while (diff > 180) diff -= 360;
+      while (diff < -180) diff += 360;
+      rawAngle = prevAngles[i] + diff * 0.15;
+    }
+    prevAngles[i] = rawAngle;
 
     const x = pt.x * scaleX + offX;
     const y = pt.y * scaleY + offY;
 
-    cards[i].style.transform = `translate(${x - cw / 2}px, ${y - ch / 2}px) rotate(${angle}deg)`;
+    cards[i].style.transform = `translate(${x - cw / 2}px, ${y - ch / 2}px) rotate(${rawAngle}deg)`;
   }
 }
 
