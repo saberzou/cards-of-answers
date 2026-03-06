@@ -477,9 +477,8 @@ let config = getConfig();
 const PATHS = {
   loop: (w, h) => {
     const cx = w / 2, cy = h / 2;
-    const rx = w * (window.innerWidth <= 768 ? 0.38 : 0.3);
-    const ry = h * (window.innerWidth <= 768 ? 0.35 : 0.32);
-    return `M ${cx - rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx + rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx - rx} ${cy}`;
+    const r = Math.min(w, h) * (window.innerWidth <= 768 ? 0.38 : 0.35);
+    return `M ${cx - r} ${cy} A ${r} ${r} 0 1 1 ${cx + r} ${cy} A ${r} ${r} 0 1 1 ${cx - r} ${cy}`;
   },
   wave: (w, h) => {
     const amp = h * 0.12, mid = h / 2;
