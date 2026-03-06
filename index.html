@@ -487,17 +487,19 @@ let config = null;
 
 const PATHS = {
   loop: (w, h) => {
-    // Codrops exact path scaled to viewport center
-    // Original in 588x187: M0 186 C138.5 186 305.5 194 305.5 49 C305.5 -113 -75 186 484.5 186 H587
-    // Scale to fit ~80% of width, centered vertically
-    const pw = w * 2.6, ph = pw * (187 / 588); // much wider for rounder loop
-    const ox = (w - pw) / 2; // centered (overflows both sides)
-    const oy = (h - ph) / 2 + ph * 0.25;
-    const sx = pw / 588, sy = ph / 187;
-    const p = (x, y) => `${x * sx + ox} ${y * sy + oy}`;
-    // Extend path beyond viewport: extra straight segments offscreen
+    // Enter top-left offscreen → circle in center → exit bottom-right offscreen
+    const cx = w / 2, cy = h / 2;
+    const r = Math.min(w, h) * 0.2; // circle radius
     const margin = w * 0.15;
-    return `M ${-margin} ${186 * sy + oy} L ${p(0, 186)} C ${p(138.5, 186)} ${p(305.5, 194)} ${p(305.5, 49)} C ${p(305.5, -113)} ${p(-75, 186)} ${p(484.5, 186)} L ${p(588, 186)} L ${w + margin} ${186 * sy + oy}`;
+    // Entry: from top-left offscreen to circle top-left tangent
+    // Circle: full circle at center
+    // Exit: from circle bottom-right tangent to bottom-right offscreen
+    return [
+      `M ${-margin} ${-margin * 0.5}`,
+      `L ${cx - r} ${cy - r * 0.6}`,
+      `A ${r} ${r} 0 1 1 ${cx - r + 0.01} ${cy - r * 0.6}`,
+      `L ${w + margin} ${h + margin * 0.5}`
+    ].join(' ');
   },
   wave: (w, h) => {
     // Open wave: offscreen left → sine wave → offscreen right
