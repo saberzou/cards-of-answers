@@ -590,34 +590,32 @@ function buildScreenPath() {
   const offX = svgRect.left;
   const offY = svgRect.top;
 
-  // Sample path and build screen-space path
   const steps = 200;
   const pts = [];
   for (let s = 0; s <= steps; s++) {
     const pt = pathEl.getPointAtLength((s / steps) * pathLength);
     pts.push({ x: pt.x * scaleX + offX, y: pt.y * scaleY + offY });
   }
-  // Build as M ... L ... Z (closed) or M ... L ... (open)
   screenPathD = `M ${pts[0].x} ${pts[0].y}`;
   for (let s = 1; s <= steps; s++) {
     screenPathD += ` L ${pts[s].x} ${pts[s].y}`;
   }
   screenPathD += ' Z';
+
+  // Apply offset-path once to all cards
+  const pathCSS = `path("${screenPathD}")`;
+  for (let i = 0; i < cards.length; i++) {
+    cards[i].style.offsetPath = pathCSS;
+  }
 }
 
 function positionCards() {
   if (!pathEl || !screenPathD) return;
-  const cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
-  const ch = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
 
   for (let i = 0; i < cards.length; i++) {
     let pct = offsets[i] % 100;
     if (pct < 0) pct += 100;
-
-    cards[i].style.offsetPath = `path("${screenPathD}")`;
     cards[i].style.offsetDistance = `${pct}%`;
-    cards[i].style.offsetAnchor = `${cw / 2}px ${ch / 2}px`;
-    cards[i].style.transform = '';
   }
 }
 
