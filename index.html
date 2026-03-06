@@ -131,10 +131,12 @@
   }
   .card-wrapper {
     position: absolute;
+    top: 0;
+    left: 0;
     width: var(--card-w);
     height: var(--card-h);
     offset-rotate: auto;
-    will-change: transform;
+    will-change: offset-distance;
     cursor: pointer;
     perspective: 600px;
     transition: filter 0.3s;
@@ -528,6 +530,8 @@ function createPath(type) {
   svg.appendChild(path);
   pathEl = path;
   pathLength = path.getTotalLength();
+  // Rebuild screen-space path on next frame (after layout)
+  requestAnimationFrame(buildScreenPath);
   return path;
 }
 
@@ -574,7 +578,9 @@ function buildCards() {
   }
 }
 
-function positionCards() {
+let screenPathD = ''; // cached screen-space path string
+
+function buildScreenPath() {
   if (!pathEl) return;
   const svg = document.getElementById('pathSvg');
   const svgRect = svg.getBoundingClientRect();
@@ -583,6 +589,24 @@ function positionCards() {
   const scaleY = svgRect.height / vbH;
   const offX = svgRect.left;
   const offY = svgRect.top;
+
+  // Sample path and build screen-space path
+  const steps = 200;
+  const pts = [];
+  for (let s = 0; s <= steps; s++) {
+    const pt = pathEl.getPointAtLength((s / steps) * pathLength);
+    pts.push({ x: pt.x * scaleX + offX, y: pt.y * scaleY + offY });
+  }
+  // Build as M ... L ... Z (closed) or M ... L ... (open)
+  screenPathD = `M ${pts[0].x} ${pts[0].y}`;
+  for (let s = 1; s <= steps; s++) {
+    screenPathD += ` L ${pts[s].x} ${pts[s].y}`;
+  }
+  screenPathD += ' Z';
+}
+
+function positionCards() {
+  if (!pathEl || !screenPathD) return;
   const cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
   const ch = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
 
@@ -590,19 +614,10 @@ function positionCards() {
     let pct = offsets[i] % 100;
     if (pct < 0) pct += 100;
 
-    const dist = (pct / 100) * pathLength;
-    const pt = pathEl.getPointAtLength(dist);
-
-    // Tangent angle + 90° so card bottom faces inside of curve
-    const dt = pathLength * 0.003;
-    const p1 = pathEl.getPointAtLength(Math.max(0, dist - dt));
-    const p2 = pathEl.getPointAtLength(Math.min(pathLength - 0.1, dist + dt));
-    const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x) * (180 / Math.PI) + 90;
-
-    const x = pt.x * scaleX + offX;
-    const y = pt.y * scaleY + offY;
-
-    cards[i].style.transform = `translate(${x - cw / 2}px, ${y - ch / 2}px) rotate(${angle}deg)`;
+    cards[i].style.offsetPath = `path("${screenPathD}")`;
+    cards[i].style.offsetDistance = `${pct}%`;
+    cards[i].style.offsetAnchor = `${cw / 2}px ${ch / 2}px`;
+    cards[i].style.transform = '';
   }
 }
 
