@@ -734,9 +734,8 @@ function animate() {
 function switchPath(type) {
   currentPath = type;
   config = getConfig();
-  buildCards();
   createPath(type);
-  // Wait for layout then build screen path and start animations
+  buildCards();
   requestAnimationFrame(() => {
     buildScreenPath();
   });
@@ -957,8 +956,8 @@ function onResize() {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     config = getConfig();
-    buildCards();
     createPath(currentPath);
+    buildCards();
     requestAnimationFrame(() => {
       buildScreenPath();
     });
@@ -966,8 +965,8 @@ function onResize() {
 }
 
 function init() {
-  buildCards();
   createPath(currentPath);
+  buildCards();
   initSnow();
   // Wait for layout then start card animations
   requestAnimationFrame(() => {
