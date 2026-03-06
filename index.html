@@ -661,16 +661,9 @@ function animate() {
 
 function switchPath(type) {
   currentPath = type;
-  const newConfig = getConfig();
-  if (newConfig.cardCount !== config.cardCount) {
-    config = newConfig;
-    buildCards();
-  }
+  config = getConfig();
+  buildCards();
   createPath(type);
-
-  for (let i = 0; i < offsets.length; i++) {
-    offsets[i] = (i / config.cardCount) * 100;
-  }
 
   document.querySelectorAll('.path-btn').forEach(b => b.classList.remove('active'));
   document.querySelector(`[data-path="${type}"]`).classList.add('active');
