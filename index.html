@@ -5,23 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Cards of Answers</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --gold: #c9a84c;
-    --gold-light: #e8d48b;
-    --gold-dark: #8b6914;
-    --bg: #0a0a0f;
+    --accent: #e83090;
+    --accent-light: #ff3070;
+    --accent-dim: #a02068;
+    --electric: #4040e0;
+    --lime: #c8f050;
+    --bg: #1a1464;
+    --bg-deep: #100e3a;
     --card-w: 140px;
     --card-h: 200px;
   }
 
   body {
     background: var(--bg);
-    color: #e8e0d0;
-    font-family: 'Cormorant Garamond', serif;
+    color: #ffffff;
+    font-family: 'DM Sans', sans-serif;
     overflow: hidden;
     height: 100dvh;
     width: 100vw;
@@ -44,23 +47,23 @@
   }
   .header > * { pointer-events: auto; }
   .logo {
-    font-family: 'Cinzel', serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--lime);
   }
   .path-switcher {
     display: flex;
     gap: 4px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(64,64,224,0.15);
+    border: 1px solid rgba(64,64,224,0.25);
     border-radius: 8px;
     padding: 4px;
   }
   .path-btn {
-    font-family: 'Cinzel', serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 11px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -75,8 +78,8 @@
   }
   .path-btn:hover { color: rgba(255,255,255,0.7); }
   .path-btn.active {
-    background: rgba(201,168,76,0.15);
-    color: var(--gold);
+    background: rgba(232,48,144,0.2);
+    color: var(--accent);
   }
 
   /* --- Prompt --- */
@@ -90,11 +93,11 @@
     width: max-content;
   }
   .prompt-text {
-    font-family: 'Cinzel', serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 13px;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--lime);
     opacity: 0.6;
     animation: breathe 3s ease-in-out infinite;
   }
@@ -136,7 +139,7 @@
     -webkit-tap-highlight-color: transparent;
   }
   .card-wrapper:hover {
-    filter: brightness(1.2) drop-shadow(0 0 20px rgba(201,168,76,0.3));
+    filter: brightness(1.2) drop-shadow(0 0 20px rgba(232,48,144,0.4));
     z-index: 10;
   }
   .card-inner {
@@ -161,8 +164,8 @@
 
   /* Card back */
   .card-back {
-    background: linear-gradient(145deg, #1a1520, #0d0b12);
-    border: 1.5px solid var(--gold-dark);
+    background: linear-gradient(145deg, #1e1870, var(--bg-deep));
+    border: 1.5px solid var(--electric);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -172,28 +175,28 @@
     content: '';
     position: absolute;
     inset: 6px;
-    border: 1px solid rgba(201,168,76,0.2);
+    border: 1px solid rgba(232,48,144,0.25);
     border-radius: 7px;
   }
   .card-back::after {
     content: '';
     position: absolute;
     inset: 12px;
-    border: 1px solid rgba(201,168,76,0.1);
+    border: 1px solid rgba(64,64,224,0.2);
     border-radius: 5px;
   }
   .card-symbol {
     font-size: 48px;
-    color: var(--gold);
-    opacity: 0.7;
-    filter: drop-shadow(0 0 8px rgba(201,168,76,0.3));
+    color: var(--accent);
+    opacity: 0.8;
+    filter: drop-shadow(0 0 8px rgba(232,48,144,0.4));
     z-index: 1;
   }
   .card-corner {
     position: absolute;
-    font-family: 'Cinzel', serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 10px;
-    color: var(--gold-dark);
+    color: var(--electric);
     opacity: 0.5;
   }
   .card-corner.tl { top: 14px; left: 14px; }
@@ -201,39 +204,39 @@
 
   /* Card front */
   .card-front {
-    background: linear-gradient(145deg, #f5f0e8, #e8dfd0);
-    border: 1.5px solid var(--gold);
+    background: linear-gradient(145deg, #1e1870, #2a20a0);
+    border: 1.5px solid var(--accent);
     transform: rotateY(180deg);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 20px 16px;
-    color: #1a1520;
+    color: #ffffff;
   }
   .card-category {
-    font-family: 'Cinzel', serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 8px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--gold-dark);
+    color: var(--lime);
     margin-bottom: 12px;
   }
   .card-answer {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 14px;
     font-weight: 400;
     line-height: 1.5;
     text-align: center;
-    color: #1a1520;
+    color: #ffffff;
     font-style: italic;
   }
   .card-number {
     position: absolute;
     bottom: 12px;
-    font-family: 'Cinzel', serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 9px;
-    color: var(--gold-dark);
+    color: var(--accent-dim);
     opacity: 0.5;
   }
 
@@ -293,7 +296,7 @@
     position: absolute;
     bottom: 60px;
     left: 50%; transform: translateX(-50%);
-    font-family: 'Cinzel', serif;
+    font-family: 'Space Grotesk', sans-serif;
     font-size: 11px;
     letter-spacing: 0.2em;
     color: rgba(255,255,255,0.3);
@@ -801,7 +804,7 @@ void main() {
       uSpeed: { value: 1.25 },
       uDepthFade: { value: 8 },
       uFarPlane: { value: 20 },
-      uColor: { value: new THREE.Vector3(0.79, 0.66, 0.3) },
+      uColor: { value: new THREE.Vector3(0.91, 0.19, 0.56) },
       uBrightness: { value: 1 },
       uGamma: { value: 0.4545 },
       uDensity: { value: 0.3 },
