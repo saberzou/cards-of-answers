@@ -487,21 +487,13 @@ let config = null;
 
 const PATHS = {
   loop: (w, h) => {
-    const cx = w / 2, cy = h * 0.45;
-    const isMobile = window.innerWidth <= 768;
-    const svgRect = document.getElementById('pathSvg').getBoundingClientRect();
-    const scaleX = svgRect.width / w;
-    const scaleY = svgRect.height / h;
-    // Circle radius
-    const circleR = isMobile ? 100 : 180;
-    const crx = circleR / scaleX;
-    const cry = circleR / scaleY;
-    // Off-screen margins
-    const offL = -w * 0.2;
-    const offR = w * 1.2;
-    const offY = h + 400; // hidden return below viewport
-    // Path: enter from left → swoop up to circle → loop around → swoop down to right → hidden return
-    return `M ${offL} ${cy} C ${cx * 0.4} ${cy} ${cx - crx * 1.5} ${cy - cry * 0.5} ${cx - crx} ${cy - cry * 0.2} A ${crx} ${cry} 0 1 1 ${cx + crx} ${cy - cry * 0.2} C ${cx + crx * 1.5} ${cy - cry * 0.5} ${cx * 1.6} ${cy} ${offR} ${cy} L ${offR} ${offY} L ${offL} ${offY} Z`;
+    // Codrops-style: open self-crossing path from left edge to right edge
+    // Original: M0 186 C138.5 186 305.5 194 305.5 49 C305.5 -113 -75 186 484.5 186 H587 (in 588x187 viewBox)
+    // Scaled to our 1600x900 viewBox
+    const sx = w / 588, sy = h / 187;
+    const my = h * 0.55; // vertical center offset
+    const oy = my - 186 * sy; // shift to center vertically
+    return `M 0 ${186 * sy + oy} C ${138.5 * sx} ${186 * sy + oy} ${305.5 * sx} ${194 * sy + oy} ${305.5 * sx} ${49 * sy + oy} C ${305.5 * sx} ${-113 * sy + oy} ${-75 * sx} ${186 * sy + oy} ${484.5 * sx} ${186 * sy + oy} L ${w} ${186 * sy + oy}`;
   },
   wave: (w, h) => {
     const amp = h * 0.12, mid = h / 2;
@@ -623,7 +615,11 @@ function buildScreenPath() {
     const cp2y = p2.y - (p3.y - p1.y) / 6;
     screenPathD += ` C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${p2.x} ${p2.y}`;
   }
-  screenPathD += ' Z';
+  // Close the screen path only if the SVG path is closed
+  const origD = pathEl.getAttribute('d');
+  if (/[Zz]\s*$/.test(origD)) {
+    screenPathD += ' Z';
+  }
 
   // Apply offset-path once to all cards
   const pathCSS = `path("${screenPathD}")`;
