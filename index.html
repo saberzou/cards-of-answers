@@ -478,9 +478,10 @@ const SYMBOLS = ["✦", "◈", "✧", "⬥", "❖", "☽", "✶", "⊕"];
 function getConfig() {
   const w = window.innerWidth;
   const isWave = currentPath === 'wave';
-  if (w <= 480) return { cardCount: isWave ? 8 : 22, speed: 0.06 };
-  if (w <= 768) return { cardCount: isWave ? 14 : 24, speed: 0.07 };
-  return { cardCount: 16, speed: 0.08 };
+  const isLoop = currentPath === 'loop';
+  if (w <= 480) return { cardCount: isWave ? 8 : isLoop ? 24 : 22, speed: 0.06 };
+  if (w <= 768) return { cardCount: isWave ? 14 : isLoop ? 30 : 24, speed: 0.07 };
+  return { cardCount: isLoop ? 30 : 16, speed: 0.08 };
 }
 
 let config = null;
