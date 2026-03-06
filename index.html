@@ -492,7 +492,7 @@ const PATHS = {
     // Scale to fit ~80% of width, centered vertically
     const pw = w * 0.8, ph = pw * (187 / 588); // maintain aspect ratio
     const ox = (w - pw) / 2; // center horizontally
-    const oy = (h - ph) / 2; // center vertically
+    const oy = (h - ph) / 2 + ph * 0.25; // push down so loop top is visible
     const sx = pw / 588, sy = ph / 187;
     const p = (x, y) => `${x * sx + ox} ${y * sy + oy}`;
     return `M ${p(0, 186)} C ${p(138.5, 186)} ${p(305.5, 194)} ${p(305.5, 49)} C ${p(305.5, -113)} ${p(-75, 186)} ${p(484.5, 186)} L ${p(588, 186)}`;
