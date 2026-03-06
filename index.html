@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Cards of Answers</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap');
@@ -27,6 +27,8 @@
     width: 100vw;
     cursor: default;
     user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
   }
 
   /* --- Header --- */
@@ -69,6 +71,7 @@
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
   }
   .path-btn:hover { color: rgba(255,255,255,0.7); }
   .path-btn.active {
@@ -84,6 +87,7 @@
     z-index: 100;
     text-align: center;
     pointer-events: none;
+    width: max-content;
   }
   .prompt-text {
     font-family: 'Cinzel', serif;
@@ -108,7 +112,6 @@
     justify-content: center;
   }
 
-  /* SVG paths (invisible, used for offset-path) */
   .path-svg {
     position: absolute;
     width: 100%;
@@ -126,10 +129,11 @@
     width: var(--card-w);
     height: var(--card-h);
     offset-rotate: auto;
-    will-change: offset-distance, transform;
+    will-change: transform;
     cursor: pointer;
     perspective: 600px;
     transition: filter 0.3s;
+    -webkit-tap-highlight-color: transparent;
   }
   .card-wrapper:hover {
     filter: brightness(1.2) drop-shadow(0 0 20px rgba(201,168,76,0.3));
@@ -150,11 +154,12 @@
     position: absolute;
     inset: 0;
     backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     border-radius: 10px;
     overflow: hidden;
   }
 
-  /* Card back — ornate mystical design */
+  /* Card back */
   .card-back {
     background: linear-gradient(145deg, #1a1520, #0d0b12);
     border: 1.5px solid var(--gold-dark);
@@ -194,7 +199,7 @@
   .card-corner.tl { top: 14px; left: 14px; }
   .card-corner.br { bottom: 14px; right: 14px; transform: rotate(180deg); }
 
-  /* Card front — answer side */
+  /* Card front */
   .card-front {
     background: linear-gradient(145deg, #f5f0e8, #e8dfd0);
     border: 1.5px solid var(--gold);
@@ -232,7 +237,7 @@
     opacity: 0.5;
   }
 
-  /* --- Pulled card overlay --- */
+  /* --- Overlay --- */
   .overlay {
     position: fixed;
     inset: 0;
@@ -253,6 +258,7 @@
     inset: 0;
     background: rgba(0,0,0,0.85);
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
   }
   .overlay-card {
     position: relative;
@@ -292,6 +298,7 @@
     letter-spacing: 0.2em;
     color: rgba(255,255,255,0.3);
     z-index: 1;
+    white-space: nowrap;
   }
 
   /* Ambient particles */
@@ -309,6 +316,94 @@
     10% { opacity: 0.6; }
     90% { opacity: 0.1; }
     100% { opacity: 0; transform: translateY(-200px) scale(1); }
+  }
+
+  /* ========== MOBILE ========== */
+  @media (max-width: 768px) {
+    :root {
+      --card-w: 80px;
+      --card-h: 114px;
+    }
+
+    .header {
+      padding: 16px 16px;
+      flex-direction: column;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .logo {
+      font-size: 12px;
+      letter-spacing: 0.2em;
+    }
+    .path-switcher {
+      gap: 2px;
+      padding: 3px;
+      align-self: center;
+    }
+    .path-btn {
+      font-size: 9px;
+      padding: 6px 10px;
+      letter-spacing: 0.05em;
+    }
+
+    .prompt {
+      bottom: 32px;
+    }
+    .prompt-text {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+    }
+
+    .card-symbol { font-size: 28px; }
+    .card-corner { font-size: 7px; }
+    .card-corner.tl { top: 8px; left: 8px; }
+    .card-corner.br { bottom: 8px; right: 8px; }
+    .card-back::before { inset: 4px; }
+    .card-back::after { inset: 7px; }
+    .card-answer { font-size: 10px; line-height: 1.4; }
+    .card-category { font-size: 6px; margin-bottom: 6px; }
+    .card-number { font-size: 7px; bottom: 8px; }
+    .card-front { padding: 12px 8px; }
+
+    .overlay-card {
+      width: 220px;
+      height: 320px;
+    }
+    .overlay-card .card-symbol { font-size: 56px; }
+    .overlay-card .card-answer { font-size: 17px; line-height: 1.5; }
+    .overlay-card .card-category { font-size: 9px; }
+    .overlay-card .card-corner { font-size: 12px; }
+    .overlay-card .card-front { padding: 24px 18px; }
+
+    .overlay-hint {
+      bottom: 40px;
+      font-size: 9px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    :root {
+      --card-w: 64px;
+      --card-h: 92px;
+    }
+
+    .card-symbol { font-size: 22px; }
+    .card-corner { font-size: 6px; }
+    .card-corner.tl { top: 6px; left: 6px; }
+    .card-corner.br { bottom: 6px; right: 6px; }
+    .card-back::before { inset: 3px; }
+    .card-back::after { inset: 5px; }
+    .card-answer { font-size: 8px; }
+    .card-category { font-size: 5px; margin-bottom: 4px; }
+    .card-number { font-size: 6px; bottom: 6px; }
+    .card-front { padding: 8px 6px; }
+
+    .overlay-card {
+      width: 200px;
+      height: 290px;
+    }
+    .overlay-card .card-symbol { font-size: 48px; }
+    .overlay-card .card-answer { font-size: 16px; }
   }
 </style>
 </head>
@@ -330,7 +425,6 @@
 
 <div class="marquee-container">
   <svg class="path-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" id="pathSvg">
-    <!-- Paths defined in JS -->
   </svg>
   <div class="card-track" id="cardTrack"></div>
 </div>
@@ -338,11 +432,10 @@
 <div class="overlay" id="overlay">
   <div class="overlay-bg" id="overlayBg"></div>
   <div class="overlay-card" id="overlayCard"></div>
-  <div class="overlay-hint">tap to flip · click outside to close</div>
+  <div class="overlay-hint">tap to flip · tap outside to close</div>
 </div>
 
 <script>
-// --- Answers ---
 const ANSWERS = [
   { category: "Courage", answer: "The thing you fear most is exactly what you must do.", symbol: "♠" },
   { category: "Patience", answer: "Not yet. But soon.", symbol: "♣" },
@@ -371,12 +464,22 @@ const ANSWERS = [
 ];
 
 const SYMBOLS = ["✦", "◈", "✧", "⬥", "❖", "☽", "✶", "⊕"];
-const CARD_COUNT = 18;
 
-// --- SVG Path definitions ---
+// --- Responsive config ---
+function getConfig() {
+  const w = window.innerWidth;
+  if (w <= 480) return { cardCount: 10, speed: 0.06 };
+  if (w <= 768) return { cardCount: 12, speed: 0.07 };
+  return { cardCount: 18, speed: 0.08 };
+}
+
+let config = getConfig();
+
 const PATHS = {
   loop: (w, h) => {
-    const cx = w / 2, cy = h / 2, rx = w * 0.3, ry = h * 0.32;
+    const cx = w / 2, cy = h / 2;
+    const rx = w * (window.innerWidth <= 768 ? 0.38 : 0.3);
+    const ry = h * (window.innerWidth <= 768 ? 0.35 : 0.32);
     return `M ${cx - rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx + rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx - rx} ${cy}`;
   },
   wave: (w, h) => {
@@ -386,9 +489,8 @@ const PATHS = {
   },
   curly: (w, h) => {
     const cx = w / 2, cy = h / 2;
-    // Lemniscate / figure-8
-    const sx = w * 0.35, sy = h * 0.3;
-    return `M ${cx} ${cy} C ${cx + sx * 0.5} ${cy - sy} ${cx + sx} ${cy - sy * 0.4} ${cx + sx * 0.6} ${cy} C ${cx + sx * 0.2} ${cy + sy * 0.4} ${cx + sx * 0.3} ${cy + sy} ${cx} ${cy} C ${cx - sx * 0.3} ${cy - sy} ${cx - sx * 0.2} ${cy - sy * 0.4} ${cx - sx * 0.6} ${cy} C ${cx - sx} ${cy + sy * 0.4} ${cx - sx * 0.5} ${cy + sy} ${cx} ${cy}`;
+    const sx = w * 0.42, sy = h * 0.36;
+    return `M ${cx} ${cy} C ${cx + sx * 0.55} ${cy - sy} ${cx + sx} ${cy - sy * 0.5} ${cx + sx * 0.65} ${cy} C ${cx + sx * 0.3} ${cy + sy * 0.5} ${cx + sx * 0.35} ${cy + sy} ${cx} ${cy} C ${cx - sx * 0.35} ${cy - sy} ${cx - sx * 0.3} ${cy - sy * 0.5} ${cx - sx * 0.65} ${cy} C ${cx - sx} ${cy + sy * 0.5} ${cx - sx * 0.55} ${cy + sy} ${cx} ${cy}`;
   },
   stream: (w, h) => {
     const y = h / 2;
@@ -401,10 +503,8 @@ let animId = null;
 let cards = [];
 let pathEl = null;
 let pathLength = 0;
-let speed = 0.08; // % per frame (~60fps)
-let offsets = []; // each card's current offset-distance %
+let offsets = [];
 
-// --- Create SVG path ---
 function createPath(type) {
   const svg = document.getElementById('pathSvg');
   const vw = 1600, vh = 900;
@@ -420,14 +520,6 @@ function createPath(type) {
   return path;
 }
 
-// --- Get CSS path string ---
-function getCSSPath(type) {
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
-  return PATHS[type](vw, vh);
-}
-
-// --- Create card DOM ---
 function createCardEl(index) {
   const answer = ANSWERS[index % ANSWERS.length];
   const sym = SYMBOLS[index % SYMBOLS.length];
@@ -456,22 +548,21 @@ function createCardEl(index) {
   return wrapper;
 }
 
-// --- Build cards ---
 function buildCards() {
   const track = document.getElementById('cardTrack');
   track.innerHTML = '';
   cards = [];
   offsets = [];
+  config = getConfig();
 
-  for (let i = 0; i < CARD_COUNT; i++) {
+  for (let i = 0; i < config.cardCount; i++) {
     const el = createCardEl(i);
     track.appendChild(el);
     cards.push(el);
-    offsets.push((i / CARD_COUNT) * 100);
+    offsets.push((i / config.cardCount) * 100);
   }
 }
 
-// --- Position cards along path ---
 function positionCards() {
   if (!pathEl) return;
   const svg = document.getElementById('pathSvg');
@@ -482,12 +573,13 @@ function positionCards() {
   const offX = svgRect.left;
   const offY = svgRect.top;
   const isOpen = currentPath === 'wave' || currentPath === 'stream';
+  const cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
+  const ch = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
 
   for (let i = 0; i < cards.length; i++) {
     let pct = offsets[i] % 100;
     if (pct < 0) pct += 100;
 
-    // For open paths, hide cards that go past the end
     if (isOpen && (pct > 99.5 || pct < 0.5)) {
       cards[i].style.opacity = '0';
     } else {
@@ -497,7 +589,6 @@ function positionCards() {
     const dist = (pct / 100) * pathLength;
     const pt = pathEl.getPointAtLength(dist);
 
-    // Tangent for rotation
     const dt = 0.5;
     const pt2 = pathEl.getPointAtLength(Math.min(dist + dt, pathLength));
     const angle = Math.atan2(pt2.y - pt.y, pt2.x - pt.x) * (180 / Math.PI);
@@ -505,20 +596,18 @@ function positionCards() {
     const x = pt.x * scaleX + offX;
     const y = pt.y * scaleY + offY;
 
-    cards[i].style.transform = `translate(${x - 70}px, ${y - 100}px) rotate(${angle}deg)`;
+    cards[i].style.transform = `translate(${x - cw / 2}px, ${y - ch / 2}px) rotate(${angle}deg)`;
   }
 }
 
-// --- Animation loop ---
 function animate() {
   const isOpen = currentPath === 'wave' || currentPath === 'stream';
 
   for (let i = 0; i < offsets.length; i++) {
-    offsets[i] += speed;
+    offsets[i] += config.speed;
     if (!isOpen) {
       if (offsets[i] >= 100) offsets[i] -= 100;
     } else {
-      // Loop: reset to beginning for open paths
       if (offsets[i] > 110) offsets[i] -= 130;
     }
   }
@@ -527,21 +616,18 @@ function animate() {
   animId = requestAnimationFrame(animate);
 }
 
-// --- Switch path ---
 function switchPath(type) {
   currentPath = type;
   createPath(type);
 
-  // Re-spread cards evenly
   for (let i = 0; i < offsets.length; i++) {
-    offsets[i] = (i / CARD_COUNT) * 100;
+    offsets[i] = (i / config.cardCount) * 100;
   }
 
   document.querySelectorAll('.path-btn').forEach(b => b.classList.remove('active'));
   document.querySelector(`[data-path="${type}"]`).classList.add('active');
 }
 
-// --- Overlay: open card ---
 function openCard(index) {
   const answer = ANSWERS[index % ANSWERS.length];
   const sym = SYMBOLS[index % SYMBOLS.length];
@@ -566,13 +652,14 @@ function openCard(index) {
 
   overlay.classList.add('active');
 
-  // Flip after short delay
   setTimeout(() => {
-    overlayCard.querySelector('.card-inner').style.transform = 'rotateY(180deg)';
-    overlayCard.querySelector('.card-inner').style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+    const inner = overlayCard.querySelector('.card-inner');
+    if (inner) {
+      inner.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+      inner.style.transform = 'rotateY(180deg)';
+    }
   }, 400);
 
-  // Toggle flip on click
   overlayCard.onclick = (e) => {
     e.stopPropagation();
     const inner = overlayCard.querySelector('.card-inner');
@@ -582,22 +669,19 @@ function openCard(index) {
 }
 
 function closeOverlay() {
-  const overlay = document.getElementById('overlay');
-  overlay.classList.remove('active');
+  document.getElementById('overlay').classList.remove('active');
 }
 
 document.getElementById('overlayBg').addEventListener('click', closeOverlay);
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
 
-// --- Path switcher ---
 document.querySelectorAll('.path-btn').forEach(btn => {
   btn.addEventListener('click', () => switchPath(btn.dataset.path));
 });
 
-// --- Ambient particles ---
 function spawnParticles() {
-  const body = document.body;
-  for (let i = 0; i < 20; i++) {
+  const count = window.innerWidth <= 768 ? 10 : 20;
+  for (let i = 0; i < count; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
     p.style.left = Math.random() * 100 + 'vw';
@@ -605,17 +689,25 @@ function spawnParticles() {
     p.style.animationDuration = 4 + Math.random() * 6 + 's';
     p.style.animationDelay = Math.random() * 8 + 's';
     p.style.width = p.style.height = (1 + Math.random() * 2) + 'px';
-    body.appendChild(p);
+    document.body.appendChild(p);
   }
 }
 
-// --- Resize handler ---
+// Debounced resize — rebuild cards on breakpoint change
+let resizeTimer;
 function onResize() {
-  createPath(currentPath);
-  positionCards();
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    const newConfig = getConfig();
+    if (newConfig.cardCount !== config.cardCount) {
+      buildCards();
+    }
+    config = newConfig;
+    createPath(currentPath);
+    positionCards();
+  }, 200);
 }
 
-// --- Init ---
 function init() {
   buildCards();
   createPath(currentPath);
