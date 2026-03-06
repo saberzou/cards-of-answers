@@ -175,6 +175,13 @@
     justify-content: center;
     flex-direction: column;
   }
+  .card-back-orange {
+    background: var(--accent);
+  }
+  .card-back-orange .card-symbol,
+  .card-back-orange .card-corner {
+    color: var(--cream);
+  }
   .card-back::before {
     content: '';
     position: absolute;
@@ -552,9 +559,12 @@ function createCardEl(index) {
   wrapper.className = 'card-wrapper';
   wrapper.dataset.index = index;
 
+  const isBlackSuit = answer.symbol === '♠' || answer.symbol === '♣';
+  const backClass = `card-face card-back${isBlackSuit ? ' card-back-orange' : ''}`;
+
   wrapper.innerHTML = `
     <div class="card-inner">
-      <div class="card-face card-back">
+      <div class="${backClass}">
         <span class="card-corner tl">${answer.symbol}</span>
         <span class="card-symbol">${sym}</span>
         <span class="card-corner br">${answer.symbol}</span>
@@ -728,9 +738,12 @@ function openCard(index) {
   const overlay = document.getElementById('overlay');
   const overlayCard = document.getElementById('overlayCard');
 
+  const isBlackSuit2 = answer.symbol === '♠' || answer.symbol === '♣';
+  const backClass2 = `card-face card-back${isBlackSuit2 ? ' card-back-orange' : ''}`;
+
   overlayCard.innerHTML = `
     <div class="card-inner">
-      <div class="card-face card-back">
+      <div class="${backClass2}">
         <span class="card-corner tl">${answer.symbol}</span>
         <span class="card-symbol">${sym}</span>
         <span class="card-corner br">${answer.symbol}</span>
