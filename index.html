@@ -574,7 +574,7 @@ function pickCard(index) {
   el.classList.add('picking');
   el.style.zIndex = 999;
   el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-  el.style.transform = `translate(${cx - cw/2}px, ${cy - ch/2}px) scale(${scale}) rotate(0deg)`;
+  el.style.transform = `translate(${cx - cw/2}px, ${cy - ch/2 - ch * 0.6}px) scale(${scale}) rotate(0deg)`;
 
   // Dim other cards
   cardEls.forEach((other, i) => {
