@@ -484,7 +484,11 @@ function getOrbitParams() {
 }
 
 function cardOrbitPos(order, n, angle, params) {
-  const theta = angle + (order / n) * Math.PI * 2;
+  // Non-uniform distribution: bunch cards at front (0) and back (π)
+  const t = order / n;
+  // Remap t so cards cluster at 0 and 0.5 (front/back of ellipse)
+  const remapped = t - 0.08 * Math.sin(t * Math.PI * 2);
+  const theta = angle + remapped * Math.PI * 2;
   const x = params.cx + Math.cos(theta) * params.rx;
   const y = params.cy + Math.sin(theta) * params.ry;
   const depth = Math.sin(theta); // -1 (back) to 1 (front)
