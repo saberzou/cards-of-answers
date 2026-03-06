@@ -314,7 +314,6 @@ let state = 'deck'; // deck | shuffling | fanned | picking | returning
 let cards = [];
 let cardEls = [];
 let pickedIndex = -1;
-let fanPositions = []; // {x, y, rotation} for each card in fan
 let deckOrder = []; // shuffled indices
 
 const stage = document.getElementById('cardStage');
@@ -466,77 +465,82 @@ function doRiffles(count, total, callback) {
   }, 200);
 }
 
-// --- Fan out on a curve ---
-let fanDriftOffset = 0;
-let fanRAF = null;
+// --- Orbit ring ---
+let orbitAngle = 0; // current rotation in radians
+let orbitRAF = null;
+const ORBIT_SPEED = 0.12; // radians per second — slow, meditative
 
-function computeFanPositions() {
+function getOrbitParams() {
   const w = window.innerWidth;
   const h = window.innerHeight;
   const cw = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
   const ch = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
-  const n = CARD_COUNT;
+  // Ellipse: wide, slightly tilted for perspective
+  const rx = Math.min(w * 0.38, 500); // horizontal radius
+  const ry = rx * 0.28; // vertical radius — perspective squish
+  const cx = w / 2 - cw / 2;
+  const cy = h / 2 - ch / 2 - 10;
+  return { rx, ry, cx, cy, cw, ch };
+}
 
-  // Arc: gentle curve from left to right
-  const margin = cw * 0.8;
-  const totalWidth = w - margin * 2;
-  const arcHeight = h * 0.08; // gentle arc
-  const centerY = h * 0.48;
-
-  fanPositions = [];
-  for (let i = 0; i < n; i++) {
-    const t = n === 1 ? 0.5 : i / (n - 1);
-    const x = margin + t * totalWidth - cw / 2;
-    const arc = -Math.sin(t * Math.PI) * arcHeight;
-    const y = centerY - ch / 2 + arc;
-    // Slight rotation following the arc tangent
-    const rot = (t - 0.5) * 12; // -6 to +6 degrees
-    fanPositions.push({ x, y, rotation: rot });
-  }
+function cardOrbitPos(order, n, angle, params) {
+  const theta = angle + (order / n) * Math.PI * 2;
+  const x = params.cx + Math.cos(theta) * params.rx;
+  const y = params.cy + Math.sin(theta) * params.ry;
+  const depth = Math.sin(theta); // -1 (back) to 1 (front)
+  // Scale slightly by depth for perspective
+  const scale = 0.75 + depth * 0.25;
+  const rot = Math.cos(theta) * -6; // tilt cards along orbit
+  const z = Math.round((depth + 1) * 100); // zIndex
+  return { x, y, scale, rot, z, depth };
 }
 
 function fanOut() {
-  computeFanPositions();
-  fanDriftOffset = 0;
-
-  cardEls.forEach((el, i) => {
-    const order = deckOrder.indexOf(i);
-    const pos = fanPositions[order];
-    el.style.transition = `transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${order * 25}ms`;
-    el.style.zIndex = order;
-    el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rotation}deg)`;
-    el.style.pointerEvents = 'auto';
-  });
-
+  orbitAngle = 0;
   state = 'fanned';
   shuffleBtn.classList.remove('disabled');
 
-  // Start gentle drift
-  startDrift();
+  // Initial position with transition
+  const params = getOrbitParams();
+  cardEls.forEach((el, i) => {
+    const order = deckOrder.indexOf(i);
+    const pos = cardOrbitPos(order, CARD_COUNT, orbitAngle, params);
+    el.style.transition = `transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${order * 20}ms, opacity 0.4s ease`;
+    el.style.zIndex = pos.z;
+    el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rot}deg) scale(${pos.scale})`;
+    el.style.opacity = '1';
+    el.style.pointerEvents = 'auto';
+  });
+
+  // Start orbit after transition settles
+  setTimeout(() => startOrbit(), 900);
 }
 
-function startDrift() {
-  if (fanRAF) cancelAnimationFrame(fanRAF);
+function startOrbit() {
+  if (orbitRAF) cancelAnimationFrame(orbitRAF);
   let lastTime = performance.now();
 
-  function drift(now) {
+  function tick(now) {
     if (state !== 'fanned') return;
     const dt = (now - lastTime) / 1000;
     lastTime = now;
-    fanDriftOffset += dt * 3; // slow breathing
+    orbitAngle += dt * ORBIT_SPEED;
 
+    const params = getOrbitParams();
     cardEls.forEach((el, i) => {
       if (i === pickedIndex) return;
       const order = deckOrder.indexOf(i);
-      const pos = fanPositions[order];
-      const breathe = Math.sin(fanDriftOffset * 0.5 + order * 0.3) * 3;
+      const pos = cardOrbitPos(order, CARD_COUNT, orbitAngle, params);
       el.style.transition = 'none';
-      el.style.transform = `translate(${pos.x}px, ${pos.y + breathe}px) rotate(${pos.rotation}deg)`;
+      el.style.zIndex = pos.z;
+      el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rot}deg) scale(${pos.scale})`;
+      // Fade cards at the back for depth
+      el.style.opacity = (0.4 + pos.depth * 0.6).toFixed(2);
     });
 
-    fanRAF = requestAnimationFrame(drift);
+    orbitRAF = requestAnimationFrame(tick);
   }
-  fanRAF = requestAnimationFrame(drift);
+  orbitRAF = requestAnimationFrame(tick);
 }
 
 // --- Card interaction ---
@@ -597,12 +601,13 @@ function putBackCard(callback) {
 
   const el = cardEls[pickedIndex];
   const order = deckOrder.indexOf(pickedIndex);
-  const pos = fanPositions[order];
+  const params = getOrbitParams();
+  const pos = cardOrbitPos(order, CARD_COUNT, orbitAngle, params);
 
   el.classList.remove('flipped', 'picking');
   el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-  el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rotation}deg)`;
-  el.style.zIndex = order;
+  el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rot}deg) scale(${pos.scale})`;
+  el.style.zIndex = pos.z;
 
   // Restore other cards
   cardEls.forEach((other) => {
@@ -631,14 +636,7 @@ window.addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
     if (state === 'fanned') {
-      computeFanPositions();
-      cardEls.forEach((el, i) => {
-        if (i === pickedIndex) return;
-        const order = deckOrder.indexOf(i);
-        const pos = fanPositions[order];
-        el.style.transition = 'transform 0.3s ease';
-        el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rotation}deg)`;
-      });
+      // Orbit auto-adapts via getOrbitParams() each frame
     } else if (state === 'deck') {
       positionAsDeck(false);
     }
