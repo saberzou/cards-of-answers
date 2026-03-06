@@ -506,8 +506,9 @@ const PATHS = {
       const rx = w * 0.38, ry = h * 0.32;
       return `M ${cx} ${cy} C ${cx + rx} ${cy - ry * 0.15} ${cx + rx} ${cy - ry * 0.85} ${cx} ${cy - ry} C ${cx - rx} ${cy - ry * 0.85} ${cx - rx} ${cy - ry * 0.15} ${cx} ${cy} C ${cx + rx} ${cy + ry * 0.15} ${cx + rx} ${cy + ry * 0.85} ${cx} ${cy + ry} C ${cx - rx} ${cy + ry * 0.85} ${cx - rx} ${cy + ry * 0.15} ${cx} ${cy}`;
     }
-    const sx = w * 0.42, sy = h * 0.36;
-    return `M ${cx} ${cy} C ${cx + sx * 0.55} ${cy - sy} ${cx + sx} ${cy - sy * 0.5} ${cx + sx * 0.65} ${cy} C ${cx + sx * 0.3} ${cy + sy * 0.5} ${cx + sx * 0.35} ${cy + sy} ${cx} ${cy} C ${cx - sx * 0.35} ${cy - sy} ${cx - sx * 0.3} ${cy - sy * 0.5} ${cx - sx * 0.65} ${cy} C ${cx - sx} ${cy + sy * 0.5} ${cx - sx * 0.55} ${cy + sy} ${cx} ${cy}`;
+    const sx = w * 0.38, sy = h * 0.38;
+    // Horizontal lemniscate ♾️ — two symmetric round lobes
+    return `M ${cx} ${cy} C ${cx + sx * 0.15} ${cy - sy} ${cx + sx * 0.85} ${cy - sy} ${cx + sx} ${cy} C ${cx + sx * 0.85} ${cy + sy} ${cx + sx * 0.15} ${cy + sy} ${cx} ${cy} C ${cx - sx * 0.15} ${cy - sy} ${cx - sx * 0.85} ${cy - sy} ${cx - sx} ${cy} C ${cx - sx * 0.85} ${cy + sy} ${cx - sx * 0.15} ${cy + sy} ${cx} ${cy}`;
   },
   // stream removed
 };
