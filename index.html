@@ -487,17 +487,15 @@ let config = null;
 
 const PATHS = {
   loop: (w, h) => {
-    // Codrops-style self-crossing loop: flat entry left → small circle center → flat exit right
-    const cx = w / 2, cy = h * 0.45;
-    const r = h * 0.18; // small tight circle
-    // Entry from left, gentle curve up into circle top
-    // Exit from circle bottom, gentle curve down to right
-    return [
-      `M 0 ${cy + r * 0.5}`,
-      `C ${w * 0.2} ${cy + r * 0.5} ${cx - r * 2} ${cy - r * 2} ${cx} ${cy - r}`,
-      `A ${r} ${r} 0 1 1 ${cx + 0.01} ${cy - r}`,
-      `C ${cx + r * 2} ${cy - r * 2} ${w * 0.8} ${cy + r * 0.5} ${w} ${cy + r * 0.5}`
-    ].join(' ');
+    // Codrops exact path scaled to viewport center
+    // Original in 588x187: M0 186 C138.5 186 305.5 194 305.5 49 C305.5 -113 -75 186 484.5 186 H587
+    // Scale to fit ~80% of width, centered vertically
+    const pw = w * 0.8, ph = pw * (187 / 588); // maintain aspect ratio
+    const ox = (w - pw) / 2; // center horizontally
+    const oy = (h - ph) / 2; // center vertically
+    const sx = pw / 588, sy = ph / 187;
+    const p = (x, y) => `${x * sx + ox} ${y * sy + oy}`;
+    return `M ${p(0, 186)} C ${p(138.5, 186)} ${p(305.5, 194)} ${p(305.5, 49)} C ${p(305.5, -113)} ${p(-75, 186)} ${p(484.5, 186)} L ${p(588, 186)}`;
   },
   wave: (w, h) => {
     const amp = h * 0.12, mid = h / 2;
