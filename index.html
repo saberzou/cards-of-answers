@@ -490,7 +490,7 @@ function cardOrbitPos(order, n, angle, params) {
   const y = params.cy + Math.sin(theta) * params.ry;
   const depth = Math.sin(theta); // -1 (back) to 1 (front)
   // Scale slightly by depth for perspective
-  const scale = 0.75 + depth * 0.25;
+  const scale = 0.88 + depth * 0.12;
   const rot = Math.cos(theta) * -6; // tilt cards along orbit
   const z = Math.round((depth + 1) * 100); // zIndex
   return { x, y, scale, rot, z, depth };
