@@ -534,7 +534,7 @@ function startOrbit() {
       el.style.transition = 'none';
       el.style.zIndex = pos.z;
       el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rot}deg) scale(${pos.scale})`;
-      // Fade cards at the back for depth
+      el.style.filter = `drop-shadow(0 ${4 + pos.depth * 8}px ${10 + pos.depth * 12}px rgba(0,0,0,${(0.25 + pos.depth * 0.2).toFixed(2)}))`;
       el.style.opacity = '1';
     });
 
