@@ -490,18 +490,23 @@ const PATHS = {
     // Codrops exact path scaled to viewport center
     // Original in 588x187: M0 186 C138.5 186 305.5 194 305.5 49 C305.5 -113 -75 186 484.5 186 H587
     // Scale to fit ~80% of width, centered vertically
-    const pw = w * 0.8, ph = pw * (187 / 588); // maintain aspect ratio
-    const ox = (w - pw) / 2; // center horizontally
-    const oy = (h - ph) / 2 + ph * 0.25; // push down so loop top is visible
+    const pw = w * 1.0, ph = pw * (187 / 588); // full width + overflow
+    const ox = (w - pw) / 2; // centered (overflows both sides)
+    const oy = (h - ph) / 2 + ph * 0.25;
     const sx = pw / 588, sy = ph / 187;
     const p = (x, y) => `${x * sx + ox} ${y * sy + oy}`;
-    return `M ${p(0, 186)} C ${p(138.5, 186)} ${p(305.5, 194)} ${p(305.5, 49)} C ${p(305.5, -113)} ${p(-75, 186)} ${p(484.5, 186)} L ${p(588, 186)}`;
+    // Extend path beyond viewport: extra straight segments offscreen
+    const margin = w * 0.15;
+    return `M ${-margin} ${186 * sy + oy} L ${p(0, 186)} C ${p(138.5, 186)} ${p(305.5, 194)} ${p(305.5, 49)} C ${p(305.5, -113)} ${p(-75, 186)} ${p(484.5, 186)} L ${p(588, 186)} L ${w + margin} ${186 * sy + oy}`;
   },
   wave: (w, h) => {
-    // Open wave: left edge → sine wave across screen → right edge
+    // Open wave: offscreen left → sine wave → offscreen right
     const amp = h * 0.08, mid = h / 2;
-    const seg = w / 4;
-    return `M 0 ${mid} C ${seg * 0.5} ${mid - amp} ${seg} ${mid - amp} ${seg * 1.5} ${mid} C ${seg * 2} ${mid + amp} ${seg * 2.5} ${mid + amp} ${seg * 3} ${mid} C ${seg * 3.5} ${mid - amp} ${seg * 4} ${mid - amp} ${w} ${mid}`;
+    const margin = w * 0.15; // extend beyond viewport
+    const totalW = w + margin * 2;
+    const seg = totalW / 4;
+    const x0 = -margin;
+    return `M ${x0} ${mid} C ${x0 + seg * 0.5} ${mid - amp} ${x0 + seg} ${mid - amp} ${x0 + seg * 1.5} ${mid} C ${x0 + seg * 2} ${mid + amp} ${x0 + seg * 2.5} ${mid + amp} ${x0 + seg * 3} ${mid} C ${x0 + seg * 3.5} ${mid - amp} ${x0 + seg * 4} ${mid - amp} ${w + margin} ${mid}`;
   },
   curly: (w, h) => {
     const cx = w / 2, cy = h / 2;
