@@ -477,10 +477,9 @@ const SYMBOLS = ["✦", "◈", "✧", "⬥", "❖", "☽", "✶", "⊕"];
 // --- Responsive config ---
 function getConfig() {
   const w = window.innerWidth;
-  const isWave = currentPath === 'wave';
-  if (w <= 480) return { cardCount: isWave ? 32 : 22, speed: 0.06 };
-  if (w <= 768) return { cardCount: isWave ? 34 : 24, speed: 0.07 };
-  return { cardCount: isWave ? 24 : 16, speed: 0.08 };
+  if (w <= 480) return { cardCount: 22, speed: 0.06 };
+  if (w <= 768) return { cardCount: 24, speed: 0.07 };
+  return { cardCount: 16, speed: 0.08 };
 }
 
 let config = null;
@@ -498,11 +497,10 @@ const PATHS = {
     return `M ${p(0, 186)} C ${p(138.5, 186)} ${p(305.5, 194)} ${p(305.5, 49)} C ${p(305.5, -113)} ${p(-75, 186)} ${p(484.5, 186)} L ${p(588, 186)}`;
   },
   wave: (w, h) => {
-    const amp = h * 0.12, mid = h / 2;
+    // Open wave: left edge → sine wave across screen → right edge
+    const amp = h * 0.15, mid = h / 2;
     const seg = w / 4;
-    // Visible wave across screen, straight return offscreen below to close the loop
-    const offY = h + 300;
-    return `M ${-w * 0.15} ${mid} C ${seg * 0.5} ${mid - amp} ${seg} ${mid - amp} ${seg * 1.5} ${mid} C ${seg * 2} ${mid + amp} ${seg * 2.5} ${mid + amp} ${seg * 3} ${mid} C ${seg * 3.5} ${mid - amp} ${seg * 4} ${mid - amp} ${w * 1.15} ${mid} L ${w * 1.15} ${offY} L ${-w * 0.15} ${offY} Z`;
+    return `M 0 ${mid} C ${seg * 0.5} ${mid - amp} ${seg} ${mid - amp} ${seg * 1.5} ${mid} C ${seg * 2} ${mid + amp} ${seg * 2.5} ${mid + amp} ${seg * 3} ${mid} C ${seg * 3.5} ${mid - amp} ${seg * 4} ${mid - amp} ${w} ${mid}`;
   },
   curly: (w, h) => {
     const cx = w / 2, cy = h / 2;
