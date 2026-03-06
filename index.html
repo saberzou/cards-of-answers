@@ -682,9 +682,6 @@ function startMarquee() {
 
       // Z-index: higher progress = higher z-index (fixes crossing overlap)
       cards[i].style.zIndex = Math.floor(offsets[i]);
-
-      // Edge opacity fade
-      cards[i].style.opacity = edgeOpacity(offsets[i]);
     }
 
     marqueeRAF = requestAnimationFrame(tick);
