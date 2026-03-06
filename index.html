@@ -469,9 +469,10 @@ const SYMBOLS = ["✦", "◈", "✧", "⬥", "❖", "☽", "✶", "⊕"];
 // --- Responsive config ---
 function getConfig() {
   const w = window.innerWidth;
-  if (w <= 480) return { cardCount: 22, speed: 0.06 };
-  if (w <= 768) return { cardCount: 24, speed: 0.07 };
-  return { cardCount: 16, speed: 0.08 };
+  const isWave = currentPath === 'wave';
+  if (w <= 480) return { cardCount: isWave ? 32 : 22, speed: 0.06 };
+  if (w <= 768) return { cardCount: isWave ? 34 : 24, speed: 0.07 };
+  return { cardCount: isWave ? 24 : 16, speed: 0.08 };
 }
 
 let config = getConfig();
@@ -660,6 +661,11 @@ function animate() {
 
 function switchPath(type) {
   currentPath = type;
+  const newConfig = getConfig();
+  if (newConfig.cardCount !== config.cardCount) {
+    config = newConfig;
+    buildCards();
+  }
   createPath(type);
 
   for (let i = 0; i < offsets.length; i++) {
