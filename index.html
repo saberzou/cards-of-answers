@@ -648,6 +648,17 @@ function startAnimations() {
     );
     cardAnimations.push(anim);
   }
+
+  // Desktop hover: slow down animation over card track
+  if (window.innerWidth > 768) {
+    const track = document.getElementById('cardTrack');
+    track.addEventListener('mouseenter', () => {
+      cardAnimations.forEach(a => { a.playbackRate = 0.15; });
+    });
+    track.addEventListener('mouseleave', () => {
+      cardAnimations.forEach(a => { a.playbackRate = 1; });
+    });
+  }
 }
 
 function positionCards() {
