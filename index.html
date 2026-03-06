@@ -33,7 +33,6 @@
     cursor: default;
     user-select: none;
     -webkit-user-select: none;
-    touch-action: none;
   }
 
   /* --- Header --- */
@@ -43,11 +42,10 @@
     z-index: 100;
     padding: 24px 32px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     pointer-events: none;
   }
-  .header > * { pointer-events: auto; }
   .logo {
     font-family: 'DM Serif Display', serif;
     font-size: 14px;
@@ -56,102 +54,66 @@
     text-transform: uppercase;
     color: var(--cream);
   }
-  .path-switcher {
-    display: flex;
-    gap: 4px;
-    background: rgba(42,42,42,0.06);
-    border: 1px solid rgba(42,42,42,0.1);
-    border-radius: 8px;
-    padding: 4px;
-  }
-  .path-btn {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--grey);
-    background: transparent;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .path-btn:hover { color: var(--cream); }
-  .path-btn.active {
-    background: rgba(232,100,30,0.12);
-    color: var(--accent);
-  }
 
-  /* --- Prompt --- */
-  .prompt {
+  /* --- Shuffle button --- */
+  .shuffle-btn {
     position: fixed;
     bottom: 48px;
-    left: 50%; transform: translateX(-50%);
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 100;
-    text-align: center;
-    pointer-events: none;
-    width: max-content;
-  }
-  .prompt-text {
     font-family: 'DM Serif Display', serif;
     font-size: 13px;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: var(--grey);
-    opacity: 0.6;
-    animation: breathe 3s ease-in-out infinite;
+    color: var(--cream);
+    background: transparent;
+    border: 1px solid rgba(240,235,224,0.2);
+    border-radius: 40px;
+    padding: 14px 40px;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    -webkit-tap-highlight-color: transparent;
   }
-  @keyframes breathe {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 0.8; }
+  .shuffle-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 30px rgba(232,100,30,0.15);
+  }
+  .shuffle-btn:active {
+    transform: translateX(-50%) scale(0.96);
+  }
+  .shuffle-btn.disabled {
+    pointer-events: none;
+    opacity: 0.3;
   }
 
-  /* --- Canvas area --- */
-  .marquee-container {
+  /* --- Card stage --- */
+  .card-stage {
     position: fixed;
     inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .path-svg {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
+    z-index: 10;
   }
 
   /* --- Cards --- */
-  .card-track {
-    position: absolute;
-    inset: 0;
-  }
   .card-wrapper {
     position: absolute;
-    top: 0;
-    left: 0;
     width: var(--card-w);
     height: var(--card-h);
-    offset-rotate: auto;
-    will-change: offset-distance;
     cursor: pointer;
-    perspective: 600px;
-    transition: filter 0.3s;
+    perspective: 800px;
     -webkit-tap-highlight-color: transparent;
+    will-change: transform;
   }
-  .card-wrapper:hover {
-    filter: brightness(1.05) drop-shadow(0 0 20px rgba(232,100,30,0.3));
-    z-index: 10;
+  .card-wrapper.picking {
+    z-index: 50 !important;
   }
   .card-inner {
     width: 100%;
     height: 100%;
     position: relative;
     transform-style: preserve-3d;
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .card-wrapper.flipped .card-inner {
     transform: rotateY(180deg);
@@ -237,7 +199,6 @@
   .card-front-symbol {
     font-size: 32px;
     color: var(--accent);
-    opacity: 1;
     margin-bottom: 4px;
   }
   .card-answer {
@@ -258,71 +219,6 @@
     opacity: 0.5;
   }
 
-  /* --- Overlay --- */
-  .overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-  .overlay.active {
-    pointer-events: auto;
-    opacity: 1;
-  }
-  .overlay-bg {
-    position: absolute;
-    inset: 0;
-    background: rgba(30,30,30,0.88);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-  .overlay-card {
-    position: relative;
-    z-index: 1;
-    width: 260px;
-    height: 380px;
-    perspective: 1000px;
-    cursor: pointer;
-  }
-  .overlay-card .card-inner {
-    width: 100%;
-    height: 100%;
-  }
-  .overlay-card .card-answer {
-    font-size: 20px;
-    line-height: 1.6;
-  }
-  .overlay-card .card-category {
-    font-size: 10px;
-    margin-bottom: 16px;
-  }
-  .overlay-card .card-symbol { font-size: 72px; }
-  .overlay-card .card-front-symbol { font-size: 48px; margin-bottom: 14px; }
-  .overlay-card .card-corner { font-size: 14px; }
-  .overlay-card .card-corner.tl { top: 18px; left: 18px; }
-  .overlay-card .card-corner.br { bottom: 18px; right: 18px; }
-  .overlay-card .card-back::before { inset: 10px; }
-  .overlay-card .card-back::after { inset: 18px; }
-  .overlay-card .card-number { font-size: 11px; bottom: 16px; }
-  .overlay-card .card-front { padding: 32px 24px; }
-
-  .overlay-hint {
-    position: absolute;
-    bottom: 60px;
-    left: 50%; transform: translateX(-50%);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    color: rgba(240,235,224,0.4);
-    z-index: 1;
-    white-space: nowrap;
-  }
-
   /* Snow background */
   #snowCanvas {
     position: fixed;
@@ -330,44 +226,16 @@
     z-index: 0;
     pointer-events: none;
   }
-  #snowCanvas canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-  }
 
   /* ========== MOBILE ========== */
   @media (max-width: 768px) {
     :root {
-      --card-w: 80px;
-      --card-h: 114px;
+      --card-w: 90px;
+      --card-h: 130px;
     }
-
-    .header {
-      padding: 16px 16px;
-    }
-    .logo {
-      font-size: 12px;
-      letter-spacing: 0.2em;
-    }
-    .path-switcher {
-      gap: 2px;
-      padding: 3px;
-    }
-    .path-btn {
-      font-size: 9px;
-      padding: 6px 10px;
-      letter-spacing: 0.05em;
-    }
-
-    .prompt {
-      bottom: 32px;
-    }
-    .prompt-text {
-      font-size: 10px;
-      letter-spacing: 0.15em;
-    }
-
+    .header { padding: 16px 16px; }
+    .logo { font-size: 12px; }
+    .shuffle-btn { bottom: 32px; font-size: 11px; padding: 12px 32px; }
     .card-symbol { font-size: 28px; }
     .card-corner { font-size: 7px; }
     .card-corner.tl { top: 8px; left: 8px; }
@@ -378,46 +246,22 @@
     .card-category { font-size: 6px; margin-bottom: 6px; }
     .card-number { font-size: 7px; bottom: 8px; }
     .card-front { padding: 12px 8px; }
-
-    .overlay-card {
-      width: 220px;
-      height: 320px;
-    }
-    .overlay-card .card-symbol { font-size: 56px; }
-    .overlay-card .card-answer { font-size: 17px; line-height: 1.5; }
-    .overlay-card .card-category { font-size: 9px; }
-    .overlay-card .card-corner { font-size: 12px; }
-    .overlay-card .card-front { padding: 24px 18px; }
-
-    .overlay-hint {
-      bottom: 40px;
-      font-size: 9px;
-    }
+    .card-front-symbol { font-size: 24px; }
   }
 
   @media (max-width: 480px) {
     :root {
-      --card-w: 64px;
-      --card-h: 92px;
+      --card-w: 72px;
+      --card-h: 104px;
     }
-
     .card-symbol { font-size: 22px; }
     .card-corner { font-size: 6px; }
-    .card-corner.tl { top: 6px; left: 6px; }
-    .card-corner.br { bottom: 6px; right: 6px; }
     .card-back::before { inset: 3px; }
     .card-back::after { inset: 5px; }
     .card-answer { font-size: 8px; }
     .card-category { font-size: 5px; margin-bottom: 4px; }
-    .card-number { font-size: 6px; bottom: 6px; }
     .card-front { padding: 8px 6px; }
-
-    .overlay-card {
-      width: 200px;
-      height: 290px;
-    }
-    .overlay-card .card-symbol { font-size: 48px; }
-    .overlay-card .card-answer { font-size: 16px; }
+    .card-front-symbol { font-size: 18px; }
   }
 </style>
 </head>
@@ -427,28 +271,11 @@
 
 <div class="header">
   <div class="logo">Cards of Answers</div>
-  <div class="path-switcher">
-    <button class="path-btn active" data-path="curly">Curly</button>
-    <button class="path-btn" data-path="loop">Loop</button>
-    <button class="path-btn" data-path="wave">Wave</button>
-  </div>
 </div>
 
-<div class="prompt">
-  <div class="prompt-text">Draw a card for your answer</div>
-</div>
+<div class="card-stage" id="cardStage"></div>
 
-<div class="marquee-container">
-  <svg class="path-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid meet" id="pathSvg">
-  </svg>
-  <div class="card-track" id="cardTrack"></div>
-</div>
-
-<div class="overlay" id="overlay">
-  <div class="overlay-bg" id="overlayBg"></div>
-  <div class="overlay-card" id="overlayCard"></div>
-  <div class="overlay-hint">tap to flip · tap outside to close</div>
-</div>
+<button class="shuffle-btn" id="shuffleBtn">Shuffle</button>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -480,84 +307,33 @@ const ANSWERS = [
 ];
 
 const SYMBOLS = ["✦", "◈", "✧", "⬥", "❖", "☽", "✶", "⊕"];
+const CARD_COUNT = ANSWERS.length;
 
-// --- Responsive config ---
-function getConfig() {
-  const w = window.innerWidth;
-  const isWave = currentPath === 'wave';
-  if (w <= 480) return { cardCount: isWave ? 8 : 22, speed: 0.06 };
-  if (w <= 768) return { cardCount: isWave ? 10 : 24, speed: 0.07 };
-  return { cardCount: isWave ? 8 : 16, speed: 0.08 };
-}
-
-let config = null;
-
-const PATHS = {
-  loop: (w, h) => {
-    // Codrops self-crossing path: from 1/3 left to 2/3 right
-    const startX = w / 3, endX = w * 2 / 3;
-    const pw = endX - startX, ph = pw * (187 / 588);
-    const ox = startX;
-    const oy = (h - ph) / 2 + ph * 0.1;
-    const sx = pw / 588, sy = ph / 187;
-    const p = (x, y) => `${x * sx + ox} ${y * sy + oy}`;
-    const margin = w * 0.15;
-    return `M ${-margin} ${186 * sy + oy} L ${p(0, 186)} C ${p(138.5, 186)} ${p(305.5, 194)} ${p(305.5, 49)} C ${p(305.5, -113)} ${p(-75, 186)} ${p(484.5, 186)} L ${p(588, 186)} L ${w + margin} ${186 * sy + oy}`;
-  },
-  wave: (w, h) => {
-    const amp = h * 0.08, mid = h / 2;
-    const margin = w * 0.15;
-    const totalW = w + margin * 2;
-    const seg = totalW / 4;
-    const x0 = -margin;
-    return `M ${x0} ${mid} C ${x0 + seg * 0.5} ${mid - amp} ${x0 + seg} ${mid - amp} ${x0 + seg * 1.5} ${mid} C ${x0 + seg * 2} ${mid + amp} ${x0 + seg * 2.5} ${mid + amp} ${x0 + seg * 3} ${mid} C ${x0 + seg * 3.5} ${mid - amp} ${x0 + seg * 4} ${mid - amp} ${w + margin} ${mid}`;
-  },
-  curly: (w, h) => {
-    const cx = w / 2, cy = h / 2;
-    const rx = w * 0.4, ry = h * 0.3;
-    // Ellipse using two arcs
-    return `M ${cx - rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx + rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx - rx} ${cy}`;
-  },
-  // stream removed
-};
-
-let currentPath = 'curly';
-let animId = null;
+// State
+let state = 'deck'; // deck | shuffling | fanned | picking | returning
 let cards = [];
-let pathEl = null;
-let pathLength = 0;
-let offsets = [];
+let cardEls = [];
+let pickedIndex = -1;
+let fanPositions = []; // {x, y, rotation} for each card in fan
+let deckOrder = []; // shuffled indices
 
-function createPath(type) {
-  const svg = document.getElementById('pathSvg');
-  const vw = 1600, vh = 900;
-  svg.innerHTML = '';
-  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  path.setAttribute('d', PATHS[type](vw, vh));
-  path.setAttribute('fill', 'none');
-  path.setAttribute('stroke', 'none');
-  path.id = 'motionPath';
-  svg.appendChild(path);
-  pathEl = path;
-  pathLength = path.getTotalLength();
-  return path;
-}
+const stage = document.getElementById('cardStage');
+const shuffleBtn = document.getElementById('shuffleBtn');
 
+// --- Card creation ---
 function createCardEl(index) {
-  const answer = ANSWERS[index % ANSWERS.length];
+  const answer = ANSWERS[index];
   const sym = SYMBOLS[index % SYMBOLS.length];
   const num = String(index + 1).padStart(2, '0');
+  const isBlack = answer.symbol === '♠' || answer.symbol === '♣';
 
   const wrapper = document.createElement('div');
   wrapper.className = 'card-wrapper';
   wrapper.dataset.index = index;
 
-  const isBlackSuit = answer.symbol === '♠' || answer.symbol === '♣';
-  const backClass = `card-face card-back${isBlackSuit ? ' card-back-orange' : ''}`;
-
   wrapper.innerHTML = `
     <div class="card-inner">
-      <div class="${backClass}">
+      <div class="card-face card-back${isBlack ? ' card-back-orange' : ''}">
         <span class="card-corner tl">${answer.symbol}</span>
         <span class="card-symbol">${sym}</span>
         <span class="card-corner br">${answer.symbol}</span>
@@ -571,215 +347,305 @@ function createCardEl(index) {
     </div>
   `;
 
-  wrapper.addEventListener('click', () => openCard(index));
+  wrapper.addEventListener('click', () => onCardClick(index));
   return wrapper;
 }
 
-function buildCards() {
-  const track = document.getElementById('cardTrack');
-  track.innerHTML = '';
-  cards = [];
-  offsets = [];
-  config = getConfig();
-
-  for (let i = 0; i < config.cardCount; i++) {
+function init() {
+  // Create all card elements
+  for (let i = 0; i < CARD_COUNT; i++) {
     const el = createCardEl(i);
-    track.appendChild(el);
-    cards.push(el);
-    offsets.push((i / config.cardCount) * 100);
+    stage.appendChild(el);
+    cardEls.push(el);
+    deckOrder.push(i);
   }
+  // Position as deck
+  positionAsDeck(false);
+  initSnow();
 }
 
-let screenPathD = ''; // cached screen-space path string
+// --- Deck position (stacked center) ---
+function positionAsDeck(animate) {
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  const cw = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
+  const ch = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
 
-function buildScreenPath() {
-  if (!pathEl) return;
-  const svg = document.getElementById('pathSvg');
-  const svgRect = svg.getBoundingClientRect();
-  const vbW = 1600, vbH = 900;
-  const scaleX = svgRect.width / vbW;
-  const scaleY = svgRect.height / vbH;
-  const offX = svgRect.left;
-  const offY = svgRect.top;
+  cardEls.forEach((el, i) => {
+    const order = deckOrder.indexOf(i);
+    const offsetY = -order * 0.4;
+    const offsetX = (Math.random() - 0.5) * 1.5;
+    const rot = (Math.random() - 0.5) * 2;
 
-  // Sample path points
-  const steps = 200;
-  const pts = [];
-  for (let s = 0; s <= steps; s++) {
-    const pt = pathEl.getPointAtLength((s / steps) * pathLength);
-    pts.push({ x: pt.x * scaleX + offX, y: pt.y * scaleY + offY });
-  }
-  // Build smooth cubic bezier path using Catmull-Rom to Bezier conversion
-  screenPathD = `M ${pts[0].x} ${pts[0].y}`;
-  for (let s = 0; s < steps; s++) {
-    const p0 = pts[s === 0 ? steps - 1 : s - 1];
-    const p1 = pts[s];
-    const p2 = pts[s + 1 > steps ? 1 : s + 1];
-    const p3 = pts[s + 2 > steps ? (s + 2 - steps) : s + 2];
-    const cp1x = p1.x + (p2.x - p0.x) / 6;
-    const cp1y = p1.y + (p2.y - p0.y) / 6;
-    const cp2x = p2.x - (p3.x - p1.x) / 6;
-    const cp2y = p2.y - (p3.y - p1.y) / 6;
-    screenPathD += ` C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${p2.x} ${p2.y}`;
-  }
-  // Close the screen path only if the SVG path is closed
-  const origD = pathEl.getAttribute('d');
-  if (/[Zz]\s*$/.test(origD)) {
-    screenPathD += ' Z';
-  }
-
-  // Apply offset-path once to all cards
-  const pathCSS = `path("${screenPathD}")`;
-  for (let i = 0; i < cards.length; i++) {
-    cards[i].style.offsetPath = pathCSS;
-  }
-  // Initialize offsets evenly
-  for (let i = 0; i < cards.length; i++) {
-    offsets[i] = (i / cards.length) * 100;
-  }
-  startMarquee();
-}
-
-// --- Spring-based hover slowdown ---
-let hoverTarget = 1;       // 1 = normal, 0.15 = slowed
-let hoverFactor = 1;       // current smoothed value
-const hoverStiffness = 4;  // spring-like smoothing speed
-
-let isHovering = false;
-let marqueeRAF = null;
-
-function wrap(min, max, v) {
-  const range = max - min;
-  return (((v - min) % range + range) % range) + min;
-}
-
-// Opacity curve: fade at path edges — f(x) = (1 − |2x − 1|^6)^2
-function edgeOpacity(pct) {
-  const x = 2 * (pct / 100) - 1;
-  return Math.pow(1 - Math.pow(Math.abs(x), 6), 2);
-}
-
-function startMarquee() {
-  if (marqueeRAF) cancelAnimationFrame(marqueeRAF);
-
-  // Desktop hover listeners
-  if (window.innerWidth > 768) {
-    cards.forEach(card => {
-      card.addEventListener('mouseenter', () => { isHovering = true; });
-      card.addEventListener('mouseleave', () => { isHovering = false; });
-    });
-  }
-
-  let lastTime = performance.now();
-  const baseVelocity = 100 / 60; // ~100% per 60s = same speed as before
-
-  function tick(now) {
-    const delta = (now - lastTime) / 1000;
-    lastTime = now;
-
-    // Smooth hover factor (spring-like lerp)
-    hoverTarget = isHovering ? 0.15 : 1;
-    hoverFactor += (hoverTarget - hoverFactor) * Math.min(1, hoverStiffness * delta);
-
-    const moveBy = baseVelocity * delta * hoverFactor;
-
-    for (let i = 0; i < cards.length; i++) {
-      offsets[i] = wrap(0, 100, offsets[i] + moveBy);
-      cards[i].style.offsetDistance = `${offsets[i]}%`;
-    }
-
-    marqueeRAF = requestAnimationFrame(tick);
-  }
-
-  marqueeRAF = requestAnimationFrame(tick);
-}
-
-function positionCards() {
-  // Called on init before marquee starts
-  for (let i = 0; i < cards.length; i++) {
-    let pct = offsets[i] % 100;
-    if (pct < 0) pct += 100;
-    cards[i].style.offsetDistance = `${pct}%`;
-  }
-}
-
-function animate() {
-  // No-op — marquee tick handles everything
-}
-
-function switchPath(type) {
-  currentPath = type;
-  config = getConfig();
-  buildCards();
-  createPath(type);
-  // Wait for layout then build screen path and start animations
-  requestAnimationFrame(() => {
-    buildScreenPath();
+    el.classList.remove('flipped', 'picking');
+    el.style.zIndex = order;
+    el.style.transition = animate ? `transform 0.5s cubic-bezier(0.4, 0, 0.2, 1) ${order * 15}ms` : 'none';
+    el.style.transform = `translate(${cx - cw/2 + offsetX}px, ${cy - ch/2 + offsetY}px) rotate(${rot}deg)`;
+    el.style.opacity = '1';
+    el.style.pointerEvents = 'none';
   });
 
-  document.querySelectorAll('.path-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector(`[data-path="${type}"]`).classList.add('active');
+  state = 'deck';
 }
 
-function openCard(index) {
-  const answer = ANSWERS[index % ANSWERS.length];
-  const sym = SYMBOLS[index % SYMBOLS.length];
-  const num = String(index + 1).padStart(2, '0');
-  const overlay = document.getElementById('overlay');
-  const overlayCard = document.getElementById('overlayCard');
+// --- Shuffle animation ---
+function shuffleDeck() {
+  if (state === 'shuffling') return;
+  state = 'shuffling';
+  shuffleBtn.classList.add('disabled');
 
-  const isBlackSuit2 = answer.symbol === '♠' || answer.symbol === '♣';
-  const backClass2 = `card-face card-back${isBlackSuit2 ? ' card-back-orange' : ''}`;
+  // If fanned, gather back first
+  if (pickedIndex >= 0) {
+    // Close picked card first
+    cardEls[pickedIndex].classList.remove('flipped', 'picking');
+    pickedIndex = -1;
+  }
 
-  overlayCard.innerHTML = `
-    <div class="card-inner">
-      <div class="${backClass2}">
-        <span class="card-corner tl">${answer.symbol}</span>
-        <span class="card-symbol">${sym}</span>
-        <span class="card-corner br">${answer.symbol}</span>
-      </div>
-      <div class="card-face card-front">
-        <span class="card-front-symbol">${sym}</span>
-        <span class="card-category">${answer.category}</span>
-        <span class="card-answer">"${answer.answer}"</span>
-        <span class="card-number">${num}</span>
-      </div>
-    </div>
-  `;
+  const gatherDuration = state === 'deck' ? 0 : 500;
 
-  overlay.classList.add('active');
+  // Gather cards to center
+  positionAsDeck(true);
 
   setTimeout(() => {
-    const inner = overlayCard.querySelector('.card-inner');
-    if (inner) {
-      inner.style.transition = 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-      inner.style.transform = 'rotateY(180deg)';
+    doRiffles(0, 3, () => {
+      // Shuffle the order
+      for (let i = deckOrder.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deckOrder[i], deckOrder[j]] = [deckOrder[j], deckOrder[i]];
+      }
+      // Fan out
+      setTimeout(() => fanOut(), 200);
+    });
+  }, gatherDuration + 300);
+}
+
+function doRiffles(count, total, callback) {
+  if (count >= total) { callback(); return; }
+
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  const cw = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
+  const ch = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
+  const half = Math.floor(CARD_COUNT / 2);
+
+  // Split left/right
+  cardEls.forEach((el, i) => {
+    const order = deckOrder.indexOf(i);
+    const isLeft = order < half;
+    const spread = isLeft ? -60 : 60;
+    const lift = -20 - Math.random() * 10;
+    const rot = isLeft ? -8 : 8;
+
+    el.style.transition = 'transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)';
+    el.style.transform = `translate(${cx - cw/2 + spread}px, ${cy - ch/2 + lift}px) rotate(${rot}deg)`;
+  });
+
+  // Interleave back
+  setTimeout(() => {
+    // Interleave deckOrder
+    const left = deckOrder.slice(0, half);
+    const right = deckOrder.slice(half);
+    const merged = [];
+    let li = 0, ri = 0;
+    while (li < left.length || ri < right.length) {
+      if (ri < right.length) merged.push(right[ri++]);
+      if (li < left.length) merged.push(left[li++]);
     }
-  }, 400);
+    deckOrder.length = 0;
+    merged.forEach(v => deckOrder.push(v));
 
-  overlayCard.onclick = (e) => {
-    e.stopPropagation();
-    const inner = overlayCard.querySelector('.card-inner');
-    const isFlipped = inner.style.transform === 'rotateY(180deg)';
-    inner.style.transform = isFlipped ? 'rotateY(0deg)' : 'rotateY(180deg)';
+    cardEls.forEach((el, i) => {
+      const order = deckOrder.indexOf(i);
+      const offsetY = -order * 0.4;
+      el.style.zIndex = order;
+      el.style.transition = 'transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)';
+      el.style.transform = `translate(${cx - cw/2}px, ${cy - ch/2 + offsetY}px) rotate(${(Math.random()-0.5)*2}deg)`;
+    });
+
+    setTimeout(() => doRiffles(count + 1, total, callback), 220);
+  }, 200);
+}
+
+// --- Fan out on a curve ---
+let fanDriftOffset = 0;
+let fanRAF = null;
+
+function computeFanPositions() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const cw = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
+  const ch = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
+  const n = CARD_COUNT;
+
+  // Arc: gentle curve from left to right
+  const margin = cw * 0.8;
+  const totalWidth = w - margin * 2;
+  const arcHeight = h * 0.08; // gentle arc
+  const centerY = h * 0.48;
+
+  fanPositions = [];
+  for (let i = 0; i < n; i++) {
+    const t = n === 1 ? 0.5 : i / (n - 1);
+    const x = margin + t * totalWidth - cw / 2;
+    const arc = -Math.sin(t * Math.PI) * arcHeight;
+    const y = centerY - ch / 2 + arc;
+    // Slight rotation following the arc tangent
+    const rot = (t - 0.5) * 12; // -6 to +6 degrees
+    fanPositions.push({ x, y, rotation: rot });
+  }
+}
+
+function fanOut() {
+  computeFanPositions();
+  fanDriftOffset = 0;
+
+  cardEls.forEach((el, i) => {
+    const order = deckOrder.indexOf(i);
+    const pos = fanPositions[order];
+    el.style.transition = `transform 0.7s cubic-bezier(0.16, 1, 0.3, 1) ${order * 25}ms`;
+    el.style.zIndex = order;
+    el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rotation}deg)`;
+    el.style.pointerEvents = 'auto';
+  });
+
+  state = 'fanned';
+  shuffleBtn.classList.remove('disabled');
+
+  // Start gentle drift
+  startDrift();
+}
+
+function startDrift() {
+  if (fanRAF) cancelAnimationFrame(fanRAF);
+  let lastTime = performance.now();
+
+  function drift(now) {
+    if (state !== 'fanned') return;
+    const dt = (now - lastTime) / 1000;
+    lastTime = now;
+    fanDriftOffset += dt * 3; // slow breathing
+
+    cardEls.forEach((el, i) => {
+      if (i === pickedIndex) return;
+      const order = deckOrder.indexOf(i);
+      const pos = fanPositions[order];
+      const breathe = Math.sin(fanDriftOffset * 0.5 + order * 0.3) * 3;
+      el.style.transition = 'none';
+      el.style.transform = `translate(${pos.x}px, ${pos.y + breathe}px) rotate(${pos.rotation}deg)`;
+    });
+
+    fanRAF = requestAnimationFrame(drift);
+  }
+  fanRAF = requestAnimationFrame(drift);
+}
+
+// --- Card interaction ---
+function onCardClick(index) {
+  if (state === 'fanned' && pickedIndex < 0) {
+    pickCard(index);
+  } else if (state === 'fanned' && pickedIndex === index) {
+    // Flip the picked card
+    cardEls[index].classList.toggle('flipped');
+  } else if (state === 'fanned' && pickedIndex >= 0 && pickedIndex !== index) {
+    // Put back current, pick new
+    putBackCard(() => pickCard(index));
+  }
+}
+
+function pickCard(index) {
+  pickedIndex = index;
+  state = 'fanned'; // still fanned, just one is picked
+
+  const el = cardEls[index];
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  const cw = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
+  const ch = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
+
+  // Scale up and center
+  const scale = Math.min(window.innerWidth / cw * 0.35, 2);
+  el.classList.add('picking');
+  el.style.zIndex = 999;
+  el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+  el.style.transform = `translate(${cx - cw/2}px, ${cy - ch/2}px) scale(${scale}) rotate(0deg)`;
+
+  // Dim other cards
+  cardEls.forEach((other, i) => {
+    if (i !== index) {
+      other.style.transition = 'opacity 0.4s ease';
+      other.style.opacity = '0.3';
+      other.style.pointerEvents = 'none';
+    }
+  });
+
+  // Auto-flip after pop
+  setTimeout(() => {
+    el.classList.add('flipped');
+  }, 350);
+
+  // Click outside to close
+  const closeHandler = (e) => {
+    if (el.contains(e.target)) return;
+    document.removeEventListener('click', closeHandler);
+    putBackCard();
   };
+  setTimeout(() => document.addEventListener('click', closeHandler), 100);
 }
 
-function closeOverlay() {
-  document.getElementById('overlay').classList.remove('active');
+function putBackCard(callback) {
+  if (pickedIndex < 0) { if (callback) callback(); return; }
+
+  const el = cardEls[pickedIndex];
+  const order = deckOrder.indexOf(pickedIndex);
+  const pos = fanPositions[order];
+
+  el.classList.remove('flipped', 'picking');
+  el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+  el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rotation}deg)`;
+  el.style.zIndex = order;
+
+  // Restore other cards
+  cardEls.forEach((other) => {
+    other.style.transition = 'opacity 0.3s ease';
+    other.style.opacity = '1';
+    other.style.pointerEvents = 'auto';
+  });
+
+  pickedIndex = -1;
+
+  setTimeout(() => { if (callback) callback(); }, 500);
 }
 
-document.getElementById('overlayBg').addEventListener('click', closeOverlay);
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
-
-document.querySelectorAll('.path-btn').forEach(btn => {
-  btn.addEventListener('click', () => switchPath(btn.dataset.path));
+// --- Shuffle button ---
+shuffleBtn.addEventListener('click', () => {
+  if (pickedIndex >= 0) {
+    putBackCard(() => setTimeout(shuffleDeck, 200));
+  } else {
+    shuffleDeck();
+  }
 });
 
-function spawnParticles() {
-  // replaced by snow shader
-}
+// --- Resize ---
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (state === 'fanned') {
+      computeFanPositions();
+      cardEls.forEach((el, i) => {
+        if (i === pickedIndex) return;
+        const order = deckOrder.indexOf(i);
+        const pos = fanPositions[order];
+        el.style.transition = 'transform 0.3s ease';
+        el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rotation}deg)`;
+      });
+    } else if (state === 'deck') {
+      positionAsDeck(false);
+    }
+  }, 200);
+});
 
+// --- Snow shader (same as before) ---
 function initSnow() {
   const container = document.getElementById('snowCanvas');
   const { Scene, OrthographicCamera, WebGLRenderer, PlaneGeometry, ShaderMaterial, Mesh, Vector2 } = THREE;
@@ -811,8 +677,6 @@ uniform float uDensity;
 uniform float uDirection;
 
 #define PI 3.14159265
-#define PI_OVER_6 0.5235988
-#define PI_OVER_3 1.0471976
 #define M1 1597334677U
 #define M2 3812015801U
 #define M3 3299493293U
@@ -930,30 +794,16 @@ void main() {
   });
 }
 
-// Debounced resize — rebuild cards on breakpoint change
-let resizeTimer;
-function onResize() {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    config = getConfig();
-    buildCards();
-    createPath(currentPath);
-    requestAnimationFrame(() => {
-      buildScreenPath();
-    });
-  }, 200);
-}
-
-function init() {
-  buildCards();
-  createPath(currentPath);
-  initSnow();
-  // Wait for layout then start card animations
-  requestAnimationFrame(() => {
-    buildScreenPath();
-  });
-  window.addEventListener('resize', onResize);
-}
+// --- Keyboard ---
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && pickedIndex >= 0) {
+    putBackCard();
+  }
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    shuffleBtn.click();
+  }
+});
 
 init();
 </script>
