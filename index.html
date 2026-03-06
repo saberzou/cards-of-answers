@@ -487,19 +487,14 @@ let config = null;
 
 const PATHS = {
   loop: (w, h) => {
-    // Enter top-left offscreen → circle in center → exit bottom-right offscreen
-    const cx = w / 2, cy = h / 2;
-    const r = Math.min(w, h) * 0.2; // circle radius
+    // 3 parallel horizontal lines
     const margin = w * 0.15;
-    // Entry: from top-left offscreen to circle top-left tangent
-    // Circle: full circle at center
-    // Exit: from circle bottom-right tangent to bottom-right offscreen
+    const y1 = h * 0.28, y2 = h * 0.5, y3 = h * 0.72;
     return [
-      `M ${-margin} ${-margin * 0.5}`,
-      `L ${cx - r} ${cy - r * 0.6}`,
-      `A ${r} ${r} 0 1 1 ${cx - r + 0.01} ${cy - r * 0.6}`,
-      `L ${w + margin} ${h + margin * 0.5}`
-    ].join(' ');
+      `M ${-margin} ${y1} L ${w + margin} ${y1}`,
+      `M ${w + margin} ${y2} L ${-margin} ${y2}`,
+      `M ${-margin} ${y3} L ${w + margin} ${y3}`
+    ];
   },
   wave: (w, h) => {
     // Open wave: offscreen left → sine wave → offscreen right
@@ -529,22 +524,36 @@ let currentPath = 'curly';
 let animId = null;
 let cards = [];
 let pathEl = null;
+let pathEls = []; // multi-path support
 let pathLength = 0;
+let pathLengths = [];
 let offsets = [];
+let cardPathIndex = []; // which path each card belongs to
 
 function createPath(type) {
   const svg = document.getElementById('pathSvg');
   const vw = 1600, vh = 900;
   svg.innerHTML = '';
-  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  path.setAttribute('d', PATHS[type](vw, vh));
-  path.setAttribute('fill', 'none');
-  path.setAttribute('stroke', 'none');
-  path.id = 'motionPath';
-  svg.appendChild(path);
-  pathEl = path;
-  pathLength = path.getTotalLength();
-  return path;
+  pathEls = [];
+  pathLengths = [];
+
+  const result = PATHS[type](vw, vh);
+  const dList = Array.isArray(result) ? result : [result];
+
+  dList.forEach((d, i) => {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('stroke', 'none');
+    path.id = `motionPath${i}`;
+    svg.appendChild(path);
+    pathEls.push(path);
+    pathLengths.push(path.getTotalLength());
+  });
+
+  pathEl = pathEls[0];
+  pathLength = pathLengths[0];
+  return pathEls[0];
 }
 
 function createCardEl(index) {
@@ -581,20 +590,28 @@ function buildCards() {
   track.innerHTML = '';
   cards = [];
   offsets = [];
+  cardPathIndex = [];
   config = getConfig();
 
-  for (let i = 0; i < config.cardCount; i++) {
+  const numPaths = pathEls.length;
+  const cardsPerPath = Math.ceil(config.cardCount / numPaths);
+  const totalCards = cardsPerPath * numPaths;
+
+  for (let i = 0; i < totalCards; i++) {
+    const pi = i % numPaths;
+    const localIdx = Math.floor(i / numPaths);
     const el = createCardEl(i);
     track.appendChild(el);
     cards.push(el);
-    offsets.push((i / config.cardCount) * 100);
+    cardPathIndex.push(pi);
+    offsets.push((localIdx / cardsPerPath) * 100);
   }
 }
 
-let screenPathD = ''; // cached screen-space path string
+let screenPathDs = []; // one per path
 
 function buildScreenPath() {
-  if (!pathEl) return;
+  if (pathEls.length === 0) return;
   const svg = document.getElementById('pathSvg');
   const svgRect = svg.getBoundingClientRect();
   const vbW = 1600, vbH = 900;
@@ -603,40 +620,43 @@ function buildScreenPath() {
   const offX = svgRect.left;
   const offY = svgRect.top;
 
-  // Sample path points
-  const steps = 200;
-  const pts = [];
-  for (let s = 0; s <= steps; s++) {
-    const pt = pathEl.getPointAtLength((s / steps) * pathLength);
-    pts.push({ x: pt.x * scaleX + offX, y: pt.y * scaleY + offY });
-  }
-  // Build smooth cubic bezier path using Catmull-Rom to Bezier conversion
-  screenPathD = `M ${pts[0].x} ${pts[0].y}`;
-  for (let s = 0; s < steps; s++) {
-    const p0 = pts[s === 0 ? steps - 1 : s - 1];
-    const p1 = pts[s];
-    const p2 = pts[s + 1 > steps ? 1 : s + 1];
-    const p3 = pts[s + 2 > steps ? (s + 2 - steps) : s + 2];
-    const cp1x = p1.x + (p2.x - p0.x) / 6;
-    const cp1y = p1.y + (p2.y - p0.y) / 6;
-    const cp2x = p2.x - (p3.x - p1.x) / 6;
-    const cp2y = p2.y - (p3.y - p1.y) / 6;
-    screenPathD += ` C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${p2.x} ${p2.y}`;
-  }
-  // Close the screen path only if the SVG path is closed
-  const origD = pathEl.getAttribute('d');
-  if (/[Zz]\s*$/.test(origD)) {
-    screenPathD += ' Z';
+  screenPathDs = [];
+
+  for (let pi = 0; pi < pathEls.length; pi++) {
+    const el = pathEls[pi];
+    const len = pathLengths[pi];
+    const steps = 200;
+    const pts = [];
+    for (let s = 0; s <= steps; s++) {
+      const pt = el.getPointAtLength((s / steps) * len);
+      pts.push({ x: pt.x * scaleX + offX, y: pt.y * scaleY + offY });
+    }
+    let spd = `M ${pts[0].x} ${pts[0].y}`;
+    for (let s = 0; s < steps; s++) {
+      const p0 = pts[s === 0 ? steps - 1 : s - 1];
+      const p1 = pts[s];
+      const p2 = pts[s + 1 > steps ? 1 : s + 1];
+      const p3 = pts[s + 2 > steps ? (s + 2 - steps) : s + 2];
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+      spd += ` C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${p2.x} ${p2.y}`;
+    }
+    const origD = el.getAttribute('d');
+    if (/[Zz]\s*$/.test(origD)) {
+      spd += ' Z';
+    }
+    screenPathDs.push(spd);
   }
 
-  // Apply offset-path once to all cards
-  const pathCSS = `path("${screenPathD}")`;
+  // Apply offset-path to each card based on its path index
+  const isMultiPath = pathEls.length > 1;
   for (let i = 0; i < cards.length; i++) {
-    cards[i].style.offsetPath = pathCSS;
-  }
-  // Initialize offsets evenly
-  for (let i = 0; i < cards.length; i++) {
-    offsets[i] = (i / cards.length) * 100;
+    const pi = cardPathIndex[i];
+    cards[i].style.offsetPath = `path("${screenPathDs[pi]}")`;
+    // Straight parallel paths: keep cards upright
+    cards[i].style.offsetRotate = isMultiPath ? '0deg' : 'auto';
   }
   startMarquee();
 }
