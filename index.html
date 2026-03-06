@@ -487,17 +487,21 @@ let config = null;
 
 const PATHS = {
   loop: (w, h) => {
-    const cx = w / 2, cy = h / 2;
+    const cx = w / 2, cy = h * 0.38;
     const isMobile = window.innerWidth <= 768;
-    // Make a perfect circle on screen by compensating for viewBox aspect ratio distortion
-    // viewBox is 1600x900 but screen has different ratio; positionCards uses separate scaleX/scaleY
-    const screenR = isMobile ? 160 : 280; // desired radius in screen pixels
     const svgRect = document.getElementById('pathSvg').getBoundingClientRect();
     const scaleX = svgRect.width / w;
     const scaleY = svgRect.height / h;
-    const rx = screenR / scaleX;
-    const ry = screenR / scaleY;
-    return `M ${cx - rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx + rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx - rx} ${cy}`;
+    // Small tight circle at top
+    const smallR = isMobile ? 100 : 160;
+    const srx = smallR / scaleX;
+    const sry = smallR / scaleY;
+    // Wide swooping curve at bottom
+    const swoopW = isMobile ? w * 0.6 : w * 0.55;
+    const swoopD = isMobile ? h * 0.5 : h * 0.55;
+    // Path: start at circle bottom (cx, cy+sry), circle CCW back to bottom,
+    // then swoop out wide left, down, right, and back up
+    return `M ${cx} ${cy + sry} A ${srx} ${sry} 0 1 0 ${cx} ${cy - sry} A ${srx} ${sry} 0 1 0 ${cx} ${cy + sry} C ${cx - swoopW * 0.6} ${cy + sry + swoopD * 0.3} ${cx - swoopW} ${cy + swoopD * 0.8} ${cx - swoopW} ${cy + swoopD} C ${cx - swoopW} ${cy + swoopD * 1.15} ${cx + swoopW} ${cy + swoopD * 1.15} ${cx + swoopW} ${cy + swoopD} C ${cx + swoopW} ${cy + swoopD * 0.8} ${cx + swoopW * 0.6} ${cy + sry + swoopD * 0.3} ${cx} ${cy + sry}`;
   },
   wave: (w, h) => {
     const amp = h * 0.12, mid = h / 2;
