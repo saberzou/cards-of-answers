@@ -488,6 +488,12 @@ const PATHS = {
   },
   curly: (w, h) => {
     const cx = w / 2, cy = h / 2;
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+      // Vertical figure-8 / ♾️ rotated 90°
+      const sx = w * 0.3, sy = h * 0.38;
+      return `M ${cx} ${cy} C ${cx + sx} ${cy - sy * 0.55} ${cx + sx * 0.5} ${cy - sy} ${cx} ${cy - sy * 0.65} C ${cx - sx * 0.5} ${cy - sy * 0.3} ${cx - sx} ${cy - sy * 0.35} ${cx} ${cy} C ${cx + sx} ${cy + sy * 0.35} ${cx + sx * 0.5} ${cy + sy * 0.3} ${cx} ${cy + sy * 0.65} C ${cx - sx * 0.5} ${cy + sy} ${cx - sx} ${cy + sy * 0.55} ${cx} ${cy}`;
+    }
     const sx = w * 0.42, sy = h * 0.36;
     return `M ${cx} ${cy} C ${cx + sx * 0.55} ${cy - sy} ${cx + sx} ${cy - sy * 0.5} ${cx + sx * 0.65} ${cy} C ${cx + sx * 0.3} ${cy + sy * 0.5} ${cx + sx * 0.35} ${cy + sy} ${cx} ${cy} C ${cx - sx * 0.35} ${cy - sy} ${cx - sx * 0.3} ${cy - sy * 0.5} ${cx - sx * 0.65} ${cy} C ${cx - sx} ${cy + sy * 0.5} ${cx - sx * 0.55} ${cy + sy} ${cx} ${cy}`;
   },
