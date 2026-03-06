@@ -586,16 +586,6 @@ function positionCards() {
   const cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
   const ch = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
 
-  // Path center for angle calculation
-  const centerPt = pathEl.getPointAtLength(0);
-  let cx = 0, cy = 0;
-  const samples = 12;
-  for (let s = 0; s < samples; s++) {
-    const sp = pathEl.getPointAtLength((s / samples) * pathLength);
-    cx += sp.x; cy += sp.y;
-  }
-  cx /= samples; cy /= samples;
-
   for (let i = 0; i < cards.length; i++) {
     let pct = offsets[i] % 100;
     if (pct < 0) pct += 100;
@@ -603,8 +593,11 @@ function positionCards() {
     const dist = (pct / 100) * pathLength;
     const pt = pathEl.getPointAtLength(dist);
 
-    // Angle from path center to card position + 90° so card bottom faces center
-    const angle = Math.atan2(pt.y - cy, pt.x - cx) * (180 / Math.PI) + 90;
+    // Tangent angle + 90° so card bottom faces inside of curve
+    const dt = pathLength * 0.003;
+    const p1 = pathEl.getPointAtLength(Math.max(0, dist - dt));
+    const p2 = pathEl.getPointAtLength(Math.min(pathLength - 0.1, dist + dt));
+    const angle = Math.atan2(p2.y - p1.y, p2.x - p1.x) * (180 / Math.PI) + 90;
 
     const x = pt.x * scaleX + offX;
     const y = pt.y * scaleY + offY;
