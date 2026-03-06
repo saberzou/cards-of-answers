@@ -467,9 +467,9 @@ const SYMBOLS = ["✦", "◈", "✧", "⬥", "❖", "☽", "✶", "⊕"];
 // --- Responsive config ---
 function getConfig() {
   const w = window.innerWidth;
-  if (w <= 480) return { cardCount: 30, speed: 0.06 };
-  if (w <= 768) return { cardCount: 32, speed: 0.07 };
-  return { cardCount: 18, speed: 0.08 };
+  if (w <= 480) return { cardCount: 36, speed: 0.06 };
+  if (w <= 768) return { cardCount: 38, speed: 0.07 };
+  return { cardCount: 24, speed: 0.08 };
 }
 
 let config = getConfig();
@@ -482,11 +482,10 @@ const PATHS = {
     return `M ${cx - rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx + rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx - rx} ${cy}`;
   },
   wave: (w, h) => {
-    const amp = h * 0.2, mid = h / 2;
-    const seg = w / 4;
-    // Visible wave across screen, straight return offscreen below to close the loop
+    const amp = h * 0.15, mid = h / 2;
+    const s = w / 6;
     const offY = h + 300;
-    return `M ${-w * 0.15} ${mid} C ${seg * 0.5} ${mid - amp} ${seg} ${mid - amp} ${seg * 1.5} ${mid} C ${seg * 2} ${mid + amp} ${seg * 2.5} ${mid + amp} ${seg * 3} ${mid} C ${seg * 3.5} ${mid - amp} ${seg * 4} ${mid - amp} ${w * 1.15} ${mid} L ${w * 1.15} ${offY} L ${-w * 0.15} ${offY} Z`;
+    return `M ${-w * 0.1} ${mid} C ${s * 0.5} ${mid - amp} ${s * 0.8} ${mid - amp} ${s} ${mid} C ${s * 1.2} ${mid + amp} ${s * 1.8} ${mid + amp} ${s * 2} ${mid} C ${s * 2.2} ${mid - amp} ${s * 2.8} ${mid - amp} ${s * 3} ${mid} C ${s * 3.2} ${mid + amp} ${s * 3.8} ${mid + amp} ${s * 4} ${mid} C ${s * 4.2} ${mid - amp} ${s * 4.8} ${mid - amp} ${s * 5} ${mid} C ${s * 5.2} ${mid + amp} ${s * 5.5} ${mid + amp} ${w * 1.1} ${mid} L ${w * 1.1} ${offY} L ${-w * 0.1} ${offY} Z`;
   },
   curly: (w, h) => {
     const cx = w / 2, cy = h / 2;
