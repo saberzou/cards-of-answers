@@ -475,7 +475,7 @@ function getConfig() {
   return { cardCount: isWave ? 24 : 16, speed: 0.08 };
 }
 
-let config = getConfig();
+let config = null;
 
 const PATHS = {
   loop: (w, h) => {
