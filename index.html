@@ -17,15 +17,15 @@
     --charcoal: #2a2a2a;
     --cream: #f0ebe0;
     --grey: #9a9590;
-    --bg: #f0ebe0;
-    --bg-deep: #e5ddd0;
+    --bg: #2a2a2a;
+    --bg-deep: #1e1e1e;
     --card-w: 140px;
     --card-h: 200px;
   }
 
   body {
     background: var(--bg);
-    color: var(--charcoal);
+    color: var(--cream);
     font-family: 'DM Sans', sans-serif;
     overflow: hidden;
     height: 100dvh;
@@ -54,7 +54,7 @@
     font-weight: 400;
     letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--charcoal);
+    color: var(--cream);
   }
   .path-switcher {
     display: flex;
@@ -78,7 +78,7 @@
     transition: all 0.3s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .path-btn:hover { color: var(--charcoal); }
+  .path-btn:hover { color: var(--cream); }
   .path-btn.active {
     background: rgba(232,100,30,0.12);
     color: var(--accent);
@@ -166,8 +166,8 @@
 
   /* Card back */
   .card-back {
-    background: var(--charcoal);
-    border: 1.5px solid rgba(42,42,42,0.8);
+    background: var(--cream);
+    border: 1.5px solid rgba(154,149,144,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -261,7 +261,7 @@
   .overlay-bg {
     position: absolute;
     inset: 0;
-    background: rgba(42,42,42,0.85);
+    background: rgba(30,30,30,0.88);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
