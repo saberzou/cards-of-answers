@@ -482,11 +482,10 @@ const PATHS = {
     return `M ${cx - rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx + rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx - rx} ${cy}`;
   },
   wave: (w, h) => {
-    const amp = h * 0.15, mid = h * 0.45;
+    const amp = h * 0.2, mid = h / 2;
     const seg = w / 4;
-    const below = h + 200; // return path below viewport
-    // Forward wave across screen, then loop back underneath (invisible)
-    return `M ${-w * 0.05} ${mid} C ${seg * 0.5} ${mid - amp} ${seg} ${mid - amp} ${seg * 1.5} ${mid} C ${seg * 2} ${mid + amp} ${seg * 2.5} ${mid + amp} ${seg * 3} ${mid} C ${seg * 3.5} ${mid - amp} ${seg * 4} ${mid - amp} ${w * 1.05} ${mid} L ${w * 1.05} ${below} L ${-w * 0.05} ${below} Z`;
+    // Extended well beyond viewport so cards recycle offscreen
+    return `M ${-w * 0.4} ${mid} C ${-w * 0.25} ${mid - amp} ${-w * 0.1} ${mid - amp} ${seg * 0.5} ${mid} C ${seg} ${mid + amp} ${seg * 1.5} ${mid + amp} ${seg * 2} ${mid} C ${seg * 2.5} ${mid - amp} ${seg * 3} ${mid - amp} ${seg * 3.5} ${mid} C ${seg * 4} ${mid + amp} ${w + w * 0.1} ${mid + amp} ${w + w * 0.25} ${mid} L ${w + w * 0.4} ${mid}`;
   },
   curly: (w, h) => {
     const cx = w / 2, cy = h / 2;
@@ -576,7 +575,7 @@ function positionCards() {
   const scaleY = svgRect.height / vbH;
   const offX = svgRect.left;
   const offY = svgRect.top;
-  const isOpen = false;
+  const isOpen = currentPath === 'wave';
   const cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
   const ch = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
 
@@ -605,7 +604,7 @@ function positionCards() {
 }
 
 function animate() {
-  const isOpen = false;
+  const isOpen = currentPath === 'wave';
 
   for (let i = 0; i < offsets.length; i++) {
     offsets[i] += config.speed;
