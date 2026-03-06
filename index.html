@@ -5,25 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Cards of Answers</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --accent: #c8f050;
-    --accent-light: #d4f570;
-    --accent-dim: #8aaa30;
-    --electric: #4040e0;
-    --lime: #c8f050;
-    --bg: #1a1464;
-    --bg-deep: #100e3a;
+    --accent: #e8641e;
+    --accent-light: #e8b020;
+    --accent-dim: #b04810;
+    --crimson: #cc2828;
+    --charcoal: #2a2a2a;
+    --cream: #f0ebe0;
+    --grey: #9a9590;
+    --bg: #f0ebe0;
+    --bg-deep: #e5ddd0;
     --card-w: 140px;
     --card-h: 200px;
   }
 
   body {
     background: var(--bg);
-    color: #ffffff;
+    color: var(--charcoal);
     font-family: 'DM Sans', sans-serif;
     overflow: hidden;
     height: 100dvh;
@@ -47,27 +49,27 @@
   }
   .header > * { pointer-events: auto; }
   .logo {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Serif Display', serif;
     font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.3em;
+    font-weight: 400;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    color: var(--lime);
+    color: var(--charcoal);
   }
   .path-switcher {
     display: flex;
     gap: 4px;
-    background: rgba(64,64,224,0.15);
-    border: 1px solid rgba(64,64,224,0.25);
+    background: rgba(42,42,42,0.06);
+    border: 1px solid rgba(42,42,42,0.1);
     border-radius: 8px;
     padding: 4px;
   }
   .path-btn {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 11px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.4);
+    color: var(--grey);
     background: transparent;
     border: none;
     padding: 8px 16px;
@@ -76,9 +78,9 @@
     transition: all 0.3s ease;
     -webkit-tap-highlight-color: transparent;
   }
-  .path-btn:hover { color: rgba(255,255,255,0.7); }
+  .path-btn:hover { color: var(--charcoal); }
   .path-btn.active {
-    background: rgba(200,240,80,0.2);
+    background: rgba(232,100,30,0.12);
     color: var(--accent);
   }
 
@@ -93,11 +95,11 @@
     width: max-content;
   }
   .prompt-text {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Serif Display', serif;
     font-size: 13px;
     letter-spacing: 0.25em;
     text-transform: uppercase;
-    color: var(--lime);
+    color: var(--grey);
     opacity: 0.6;
     animation: breathe 3s ease-in-out infinite;
   }
@@ -139,7 +141,7 @@
     -webkit-tap-highlight-color: transparent;
   }
   .card-wrapper:hover {
-    filter: brightness(1.2) drop-shadow(0 0 20px rgba(200,240,80,0.4));
+    filter: brightness(1.05) drop-shadow(0 0 20px rgba(232,100,30,0.3));
     z-index: 10;
   }
   .card-inner {
@@ -164,8 +166,8 @@
 
   /* Card back */
   .card-back {
-    background: linear-gradient(145deg, #1e1870, var(--bg-deep));
-    border: 1.5px solid var(--electric);
+    background: var(--charcoal);
+    border: 1.5px solid rgba(42,42,42,0.8);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -175,28 +177,28 @@
     content: '';
     position: absolute;
     inset: 6px;
-    border: 1px solid rgba(200,240,80,0.25);
+    border: 1px solid rgba(232,100,30,0.2);
     border-radius: 7px;
   }
   .card-back::after {
     content: '';
     position: absolute;
     inset: 12px;
-    border: 1px solid rgba(64,64,224,0.2);
+    border: 1px solid rgba(232,176,32,0.15);
     border-radius: 5px;
   }
   .card-symbol {
     font-size: 48px;
     color: var(--accent);
     opacity: 0.8;
-    filter: drop-shadow(0 0 8px rgba(200,240,80,0.4));
+    filter: drop-shadow(0 0 8px rgba(232,100,30,0.3));
     z-index: 1;
   }
   .card-corner {
     position: absolute;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Serif Display', serif;
     font-size: 10px;
-    color: var(--electric);
+    color: var(--accent-light);
     opacity: 0.5;
   }
   .card-corner.tl { top: 14px; left: 14px; }
@@ -204,7 +206,7 @@
 
   /* Card front */
   .card-front {
-    background: linear-gradient(145deg, #1e1870, #2a20a0);
+    background: var(--cream);
     border: 1.5px solid var(--accent);
     transform: rotateY(180deg);
     display: flex;
@@ -212,14 +214,14 @@
     align-items: center;
     justify-content: center;
     padding: 20px 16px;
-    color: #ffffff;
+    color: var(--charcoal);
   }
   .card-category {
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Serif Display', serif;
     font-size: 8px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--lime);
+    color: var(--crimson);
     margin-bottom: 12px;
   }
   .card-answer {
@@ -228,15 +230,15 @@
     font-weight: 400;
     line-height: 1.5;
     text-align: center;
-    color: #ffffff;
+    color: var(--charcoal);
     font-style: italic;
   }
   .card-number {
     position: absolute;
     bottom: 12px;
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 9px;
-    color: var(--accent-dim);
+    color: var(--grey);
     opacity: 0.5;
   }
 
@@ -259,7 +261,7 @@
   .overlay-bg {
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.85);
+    background: rgba(42,42,42,0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
   }
@@ -296,10 +298,10 @@
     position: absolute;
     bottom: 60px;
     left: 50%; transform: translateX(-50%);
-    font-family: 'Space Grotesk', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 11px;
     letter-spacing: 0.2em;
-    color: rgba(255,255,255,0.3);
+    color: rgba(240,235,224,0.4);
     z-index: 1;
     white-space: nowrap;
   }
@@ -804,7 +806,7 @@ void main() {
       uSpeed: { value: 1.25 },
       uDepthFade: { value: 8 },
       uFarPlane: { value: 20 },
-      uColor: { value: new THREE.Vector3(0.78, 0.94, 0.31) },
+      uColor: { value: new THREE.Vector3(0.91, 0.39, 0.12) },
       uBrightness: { value: 1 },
       uGamma: { value: 0.4545 },
       uDensity: { value: 0.3 },
