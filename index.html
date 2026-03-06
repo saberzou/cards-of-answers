@@ -19,8 +19,8 @@
     --grey: #9a9590;
     --bg: #141414;
     --bg-deep: #0a0a0a;
-    --card-w: 140px;
-    --card-h: 200px;
+    --card-w: 170px;
+    --card-h: 240px;
   }
 
   body {
@@ -535,7 +535,7 @@ function startOrbit() {
       el.style.zIndex = pos.z;
       el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rot}deg) scale(${pos.scale})`;
       // Fade cards at the back for depth
-      el.style.opacity = (0.4 + pos.depth * 0.6).toFixed(2);
+      el.style.opacity = '1';
     });
 
     orbitRAF = requestAnimationFrame(tick);
