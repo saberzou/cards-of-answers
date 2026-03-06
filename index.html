@@ -607,26 +607,45 @@ function buildScreenPath() {
   for (let i = 0; i < cards.length; i++) {
     cards[i].style.offsetPath = pathCSS;
   }
+  startAnimations();
+}
+
+let cardAnimations = [];
+
+function startAnimations() {
+  // Cancel any existing animations
+  cardAnimations.forEach(a => a.cancel());
+  cardAnimations = [];
+
+  if (!screenPathD) return;
+
+  // Total loop duration in ms — controls speed
+  const duration = 30000;
+
+  for (let i = 0; i < cards.length; i++) {
+    const startPct = (i / cards.length) * 100;
+    // Web Animations API — runs on compositor thread, no jank
+    const anim = cards[i].animate(
+      [
+        { offsetDistance: `${startPct}%` },
+        { offsetDistance: `${startPct + 100}%` }
+      ],
+      {
+        duration: duration,
+        iterations: Infinity,
+        easing: 'linear'
+      }
+    );
+    cardAnimations.push(anim);
+  }
 }
 
 function positionCards() {
-  if (!pathEl || !screenPathD) return;
-
-  for (let i = 0; i < cards.length; i++) {
-    let pct = offsets[i] % 100;
-    if (pct < 0) pct += 100;
-    cards[i].style.offsetDistance = `${pct}%`;
-  }
+  // No-op: animations handle positioning now
 }
 
 function animate() {
-  for (let i = 0; i < offsets.length; i++) {
-    offsets[i] += config.speed;
-    if (offsets[i] >= 100) offsets[i] -= 100;
-  }
-
-  positionCards();
-  animId = requestAnimationFrame(animate);
+  // No-op: Web Animations API handles everything
 }
 
 function switchPath(type) {
