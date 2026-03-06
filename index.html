@@ -288,16 +288,6 @@
     margin-bottom: 16px;
   }
   .overlay-card .card-symbol { font-size: 72px; }
-  .card-symbol-front {
-    font-size: 36px;
-    color: var(--accent);
-    opacity: 0.35;
-    margin-bottom: 8px;
-  }
-  .overlay-card .card-symbol-front {
-    font-size: 52px;
-    margin-bottom: 12px;
-  }
   .overlay-card .card-corner { font-size: 14px; }
   .overlay-card .card-corner.tl { top: 18px; left: 18px; }
   .overlay-card .card-corner.br { bottom: 18px; right: 18px; }
@@ -709,7 +699,6 @@ function openCard(index) {
         <span class="card-corner br">${answer.symbol}</span>
       </div>
       <div class="card-face card-front">
-        <span class="card-symbol-front">${sym}</span>
         <span class="card-category">${answer.category}</span>
         <span class="card-answer">"${answer.answer}"</span>
         <span class="card-number">${num}</span>
