@@ -515,15 +515,9 @@ const PATHS = {
   },
   curly: (w, h) => {
     const cx = w / 2, cy = h / 2;
-    const isMobile = window.innerWidth <= 768;
-    if (isMobile) {
-      // Vertical lemniscate (♾️ rotated 90°) — wide rounded lobes
-      const rx = w * 0.38, ry = h * 0.32;
-      return `M ${cx} ${cy} C ${cx + rx} ${cy - ry * 0.15} ${cx + rx} ${cy - ry * 0.85} ${cx} ${cy - ry} C ${cx - rx} ${cy - ry * 0.85} ${cx - rx} ${cy - ry * 0.15} ${cx} ${cy} C ${cx + rx} ${cy + ry * 0.15} ${cx + rx} ${cy + ry * 0.85} ${cx} ${cy + ry} C ${cx - rx} ${cy + ry * 0.85} ${cx - rx} ${cy + ry * 0.15} ${cx} ${cy}`;
-    }
-    const sx = w * 0.38, sy = h * 0.38;
-    // Horizontal lemniscate ♾️ — two symmetric round lobes
-    return `M ${cx} ${cy} C ${cx + sx * 0.15} ${cy - sy} ${cx + sx * 0.85} ${cy - sy} ${cx + sx} ${cy} C ${cx + sx * 0.85} ${cy + sy} ${cx + sx * 0.15} ${cy + sy} ${cx} ${cy} C ${cx - sx * 0.15} ${cy - sy} ${cx - sx * 0.85} ${cy - sy} ${cx - sx} ${cy} C ${cx - sx * 0.85} ${cy + sy} ${cx - sx * 0.15} ${cy + sy} ${cx} ${cy}`;
+    const rx = w * 0.4, ry = h * 0.3;
+    // Ellipse using two arcs
+    return `M ${cx - rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx + rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx - rx} ${cy}`;
   },
   // stream removed
 };
