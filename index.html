@@ -484,8 +484,9 @@ const PATHS = {
   wave: (w, h) => {
     const amp = h * 0.2, mid = h / 2;
     const seg = w / 4;
-    // Extended well beyond viewport so cards recycle offscreen
-    return `M ${-w * 0.4} ${mid} C ${-w * 0.25} ${mid - amp} ${-w * 0.1} ${mid - amp} ${seg * 0.5} ${mid} C ${seg} ${mid + amp} ${seg * 1.5} ${mid + amp} ${seg * 2} ${mid} C ${seg * 2.5} ${mid - amp} ${seg * 3} ${mid - amp} ${seg * 3.5} ${mid} C ${seg * 4} ${mid + amp} ${w + w * 0.1} ${mid + amp} ${w + w * 0.25} ${mid} L ${w + w * 0.4} ${mid}`;
+    // Visible wave across screen, straight return offscreen below to close the loop
+    const offY = h + 300;
+    return `M ${-w * 0.15} ${mid} C ${seg * 0.5} ${mid - amp} ${seg} ${mid - amp} ${seg * 1.5} ${mid} C ${seg * 2} ${mid + amp} ${seg * 2.5} ${mid + amp} ${seg * 3} ${mid} C ${seg * 3.5} ${mid - amp} ${seg * 4} ${mid - amp} ${w * 1.15} ${mid} L ${w * 1.15} ${offY} L ${-w * 0.15} ${offY} Z`;
   },
   curly: (w, h) => {
     const cx = w / 2, cy = h / 2;
@@ -575,19 +576,12 @@ function positionCards() {
   const scaleY = svgRect.height / vbH;
   const offX = svgRect.left;
   const offY = svgRect.top;
-  const isOpen = currentPath === 'wave';
   const cw = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
   const ch = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
 
   for (let i = 0; i < cards.length; i++) {
     let pct = offsets[i] % 100;
     if (pct < 0) pct += 100;
-
-    if (isOpen && (pct > 99.5 || pct < 0.5)) {
-      cards[i].style.opacity = '0';
-    } else {
-      cards[i].style.opacity = '1';
-    }
 
     const dist = (pct / 100) * pathLength;
     const pt = pathEl.getPointAtLength(dist);
@@ -604,15 +598,9 @@ function positionCards() {
 }
 
 function animate() {
-  const isOpen = currentPath === 'wave';
-
   for (let i = 0; i < offsets.length; i++) {
     offsets[i] += config.speed;
-    if (!isOpen) {
-      if (offsets[i] >= 100) offsets[i] -= 100;
-    } else {
-      if (offsets[i] > 110) offsets[i] -= 130;
-    }
+    if (offsets[i] >= 100) offsets[i] -= 100;
   }
 
   positionCards();
