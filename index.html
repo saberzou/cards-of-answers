@@ -476,8 +476,8 @@ function getOrbitParams() {
   const cw = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
   const ch = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
   // Ellipse: wide, slightly tilted for perspective
-  const rx = Math.min(w * 0.38, 500); // horizontal radius
-  const ry = rx * 0.28; // vertical radius — perspective squish
+  const rx = Math.min(w * 0.42, 620); // horizontal radius
+  const ry = rx * 0.32; // vertical radius — perspective squish
   const cx = w / 2 - cw / 2;
   const cy = h / 2 - ch / 2 - 10;
   return { rx, ry, cx, cy, cw, ch };
