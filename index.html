@@ -649,14 +649,15 @@ function startAnimations() {
     cardAnimations.push(anim);
   }
 
-  // Desktop hover: slow down animation over card track
+  // Desktop hover: slow down when hovering individual cards
   if (window.innerWidth > 768) {
-    const track = document.getElementById('cardTrack');
-    track.addEventListener('mouseenter', () => {
-      cardAnimations.forEach(a => { a.playbackRate = 0.15; });
-    });
-    track.addEventListener('mouseleave', () => {
-      cardAnimations.forEach(a => { a.playbackRate = 1; });
+    cards.forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        cardAnimations.forEach(a => { a.playbackRate = 0.15; });
+      });
+      card.addEventListener('mouseleave', () => {
+        cardAnimations.forEach(a => { a.playbackRate = 1; });
+      });
     });
   }
 }
