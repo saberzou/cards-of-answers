@@ -411,9 +411,9 @@
 <div class="header">
   <div class="logo">Cards of Answers</div>
   <div class="path-switcher">
-    <button class="path-btn active" data-path="loop">Loop</button>
+    <button class="path-btn" data-path="loop">Loop</button>
     <button class="path-btn" data-path="wave">Wave</button>
-    <button class="path-btn" data-path="curly">Curly</button>
+    <button class="path-btn active" data-path="curly">Curly</button>
   </div>
 </div>
 
@@ -494,7 +494,7 @@ const PATHS = {
   // stream removed
 };
 
-let currentPath = 'loop';
+let currentPath = 'curly';
 let animId = null;
 let cards = [];
 let pathEl = null;
