@@ -498,7 +498,7 @@ const PATHS = {
   },
   wave: (w, h) => {
     // Open wave: left edge → sine wave across screen → right edge
-    const amp = h * 0.15, mid = h / 2;
+    const amp = h * 0.08, mid = h / 2;
     const seg = w / 4;
     return `M 0 ${mid} C ${seg * 0.5} ${mid - amp} ${seg} ${mid - amp} ${seg * 1.5} ${mid} C ${seg * 2} ${mid + amp} ${seg * 2.5} ${mid + amp} ${seg * 3} ${mid} C ${seg * 3.5} ${mid - amp} ${seg * 4} ${mid - amp} ${w} ${mid}`;
   },
