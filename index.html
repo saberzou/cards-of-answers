@@ -482,7 +482,7 @@ const PATHS = {
     return `M ${cx - rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx + rx} ${cy} A ${rx} ${ry} 0 1 1 ${cx - rx} ${cy}`;
   },
   wave: (w, h) => {
-    const amp = h * 0.2, mid = h / 2;
+    const amp = h * 0.12, mid = h / 2;
     const seg = w / 4;
     // Visible wave across screen, straight return offscreen below to close the loop
     const offY = h + 300;
