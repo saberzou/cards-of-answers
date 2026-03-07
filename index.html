@@ -556,7 +556,7 @@ function createCardEl(index) {
   const wm = wrapper.querySelector('.card-watermark');
   const iconSvg = CATEGORY_ICONS[answer.category];
   if (wm && iconSvg) {
-    const encoded = encodeURIComponent(iconSvg.replace('currentColor', '%23c8b8a0'));
+    const encoded = encodeURIComponent(iconSvg.replace(/currentColor/g, '#c8b8a0'));
     wm.style.backgroundImage = `url("data:image/svg+xml,${encoded}")`;
   }
 
