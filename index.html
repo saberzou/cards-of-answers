@@ -219,6 +219,23 @@
     opacity: 0.5;
   }
 
+  /* --- Pick overlay --- */
+  .pick-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    background: rgba(20,20,20,0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+  .pick-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   /* Snow background */
   #snowCanvas {
     position: fixed;
@@ -274,6 +291,7 @@
 </div>
 
 <div class="card-stage" id="cardStage"></div>
+<div class="pick-overlay" id="pickOverlay"></div>
 
 <button class="shuffle-btn" id="shuffleBtn">Shuffle</button>
 
@@ -571,13 +589,15 @@ function pickCard(index) {
   el.classList.add('picking');
   el.style.zIndex = 999;
   el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-  el.style.transform = `translate(${cx - cw/2}px, ${cy - ch/2 - ch * 0.6}px) scale(${scale}) rotate(0deg)`;
+  el.style.transform = `translate(${cx - cw/2}px, ${cy - ch/2}px) scale(${scale}) rotate(0deg)`;
+
+  // Show backdrop blur
+  const overlay = document.getElementById('pickOverlay');
+  overlay.classList.add('active');
 
   // Dim other cards
   cardEls.forEach((other, i) => {
     if (i !== index) {
-      other.style.transition = 'opacity 0.4s ease';
-      other.style.opacity = '0.3';
       other.style.pointerEvents = 'none';
     }
   });
@@ -593,7 +613,13 @@ function pickCard(index) {
     document.removeEventListener('click', closeHandler);
     putBackCard();
   };
-  setTimeout(() => document.addEventListener('click', closeHandler), 100);
+  setTimeout(() => {
+    document.addEventListener('click', closeHandler);
+    document.getElementById('pickOverlay').onclick = () => {
+      document.removeEventListener('click', closeHandler);
+      putBackCard();
+    };
+  }, 100);
 }
 
 function putBackCard(callback) {
@@ -610,9 +636,8 @@ function putBackCard(callback) {
   el.style.zIndex = pos.z;
 
   // Restore other cards
+  document.getElementById('pickOverlay').classList.remove('active');
   cardEls.forEach((other) => {
-    other.style.transition = 'opacity 0.3s ease';
-    other.style.opacity = '1';
     other.style.pointerEvents = 'auto';
   });
 
