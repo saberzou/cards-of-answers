@@ -150,18 +150,21 @@
   /* Card back */
   .card-back {
     background: var(--cream);
-    background-size: cover;
-    background-position: center;
     border: 1.5px solid rgba(154,149,144,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    padding: 10px;
   }
   .card-back-orange {
     background-color: var(--accent);
-    background-size: cover;
-    background-position: center;
+  }
+  .card-back-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
   }
   .card-back-orange .card-symbol,
   .card-back-orange .card-corner {
@@ -617,9 +620,7 @@ function createCardEl(index) {
   wrapper.innerHTML = `
     <div class="card-inner">
       <div class="card-face card-back${isBlack ? ' card-back-orange' : ''}">
-        <span class="card-corner tl">${answer.symbol}</span>
-        ${generateMandala(index)}
-        <span class="card-corner br">${answer.symbol}</span>
+        <img class="card-back-img" src="${window._CARD_BACKS ? (window._CARD_BACKS[index] || window._CARD_BACKS[index % window._CARD_BACKS.length]) : ''}" alt="" loading="lazy">
       </div>
       <div class="card-face card-front">
         <div class="card-watermark" data-category="${answer.category}"></div>
@@ -629,14 +630,6 @@ function createCardEl(index) {
       </div>
     </div>
   `;
-
-  // Set card back illustration
-  const backEl = wrapper.querySelector('.card-back');
-  if (window._CARD_BACKS && window._CARD_BACKS[index]) {
-    backEl.style.backgroundImage = `url(${window._CARD_BACKS[index]})`;
-  } else if (window._CARD_BACKS) {
-    backEl.style.backgroundImage = `url(${window._CARD_BACKS[index % window._CARD_BACKS.length]})`;
-  }
 
   wrapper.addEventListener('click', () => onCardClick(index));
 
