@@ -208,7 +208,7 @@
   /* Card front */
   .card-front {
     background: var(--cream);
-    border: 1.5px solid var(--accent);
+    border: none;
     transform: rotateY(180deg);
     display: flex;
     flex-direction: column;
@@ -217,6 +217,22 @@
     padding: 20px 16px 32px;
     color: var(--charcoal);
     z-index: 2;
+    overflow: hidden;
+  }
+  .card-watermark {
+    position: absolute;
+    inset: -50%;
+    transform: rotate(-30deg);
+    opacity: 0.06;
+    pointer-events: none;
+    background-repeat: repeat;
+    background-size: 36px 36px;
+    z-index: 0;
+  }
+  .card-front-symbol, .card-category, .card-answer {
+    position: relative;
+    z-index: 1;
+  }
   }
   .card-category {
     font-family: 'Goudy Bookletter 1911', serif;
@@ -526,6 +542,7 @@ function createCardEl(index) {
         <span class="card-corner br">${answer.symbol}</span>
       </div>
       <div class="card-face card-front">
+        <div class="card-watermark" data-category="${answer.category}"></div>
         <span class="card-front-symbol">${CATEGORY_ICONS[answer.category] || sym}</span>
         <span class="card-category">${answer.category}</span>
         <span class="card-answer">"${answer.answer}"</span>
@@ -534,6 +551,15 @@ function createCardEl(index) {
   `;
 
   wrapper.addEventListener('click', () => onCardClick(index));
+
+  // Set watermark background from category icon SVG
+  const wm = wrapper.querySelector('.card-watermark');
+  const iconSvg = CATEGORY_ICONS[answer.category];
+  if (wm && iconSvg) {
+    const encoded = encodeURIComponent(iconSvg.replace('currentColor', '%23c8b8a0'));
+    wm.style.backgroundImage = `url("data:image/svg+xml,${encoded}")`;
+  }
+
   return wrapper;
 }
 
