@@ -587,6 +587,8 @@ function pickCard(index) {
   el.classList.add('picking');
   el.style.zIndex = 600;
   el.style.position = 'fixed';
+  el.style.filter = 'none';
+  el.style.opacity = '1';
   el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
   el.style.transform = `translate(${cx - cw/2}px, ${cy - ch/2}px) scale(${scale}) rotate(0deg)`;
 
