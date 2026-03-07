@@ -391,29 +391,110 @@ const CATEGORY_ICONS = {
   Mystery:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round"><path d="M12 3a6 6 0 016 6c0 3-2 4-3.5 5.5S12 17 12 19"/><circle cx="12" cy="22" r=".5" fill="currentColor"/></svg>`,
 };
 
-// SVG mandala for card back
-const MANDALA_SVG = `<svg class="card-mandala" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="0.8">
-  <circle cx="50" cy="50" r="42" opacity="0.6"/>
-  <circle cx="50" cy="50" r="30" opacity="0.5"/>
-  <circle cx="50" cy="50" r="18" opacity="0.6"/>
-  <circle cx="50" cy="50" r="6" opacity="0.7"/>
-  ${Array.from({length: 12}, (_, i) => {
-    const a = i * 30 * Math.PI / 180;
-    const x1 = 50 + 6 * Math.cos(a), y1 = 50 + 6 * Math.sin(a);
-    const x2 = 50 + 42 * Math.cos(a), y2 = 50 + 42 * Math.sin(a);
-    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" opacity="0.45"/>`;
-  }).join('')}
-  ${Array.from({length: 6}, (_, i) => {
-    const a = i * 60 * Math.PI / 180;
-    const x = 50 + 24 * Math.cos(a), y = 50 + 24 * Math.sin(a);
-    return `<circle cx="${x}" cy="${y}" r="3" opacity="0.45"/>`;
-  }).join('')}
-  ${Array.from({length: 8}, (_, i) => {
-    const a = (i * 45 + 22.5) * Math.PI / 180;
-    const x = 50 + 36 * Math.cos(a), y = 50 + 36 * Math.sin(a);
-    return `<path d="M${x-2},${y} L${x},${y-2} L${x+2},${y} L${x},${y+2}Z" opacity="0.5"/>`;
-  }).join('')}
-</svg>`;
+// Seeded PRNG (mulberry32)
+function seededRng(seed) {
+  return function() {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+// Generative mandala — each card index produces a unique pattern
+function generateMandala(index) {
+  const rng = seededRng(index * 7919 + 137);
+  const pick = (arr) => arr[Math.floor(rng() * arr.length)];
+  const range = (lo, hi) => lo + rng() * (hi - lo);
+
+  // Vary structure per card
+  const numRings = Math.floor(range(2, 5));
+  const numRays = pick([6, 8, 10, 12, 16]);
+  const hasInnerPolygon = rng() > 0.4;
+  const hasOrbitDots = rng() > 0.35;
+  const hasPetals = rng() > 0.5;
+  const hasDiamonds = rng() > 0.5;
+  const rotOffset = range(0, 360);
+
+  let paths = '';
+
+  // Concentric rings at varied radii
+  const ringRadii = Array.from({length: numRings}, (_, i) =>
+    8 + (34 / (numRings - 1 || 1)) * i + range(-2, 2)
+  ).sort((a, b) => a - b);
+
+  ringRadii.forEach(r => {
+    paths += `<circle cx="50" cy="50" r="${r.toFixed(1)}" opacity="${range(0.4, 0.65).toFixed(2)}"/>`;
+  });
+
+  // Center dot
+  paths += `<circle cx="50" cy="50" r="${range(1.5, 3).toFixed(1)}" opacity="0.7" fill="currentColor" stroke="none"/>`;
+
+  // Radiating rays
+  const innerR = ringRadii[0] || 8;
+  const outerR = ringRadii[ringRadii.length - 1] || 42;
+  for (let i = 0; i < numRays; i++) {
+    const a = (rotOffset + i * 360 / numRays) * Math.PI / 180;
+    const x1 = 50 + innerR * Math.cos(a), y1 = 50 + innerR * Math.sin(a);
+    const x2 = 50 + outerR * Math.cos(a), y2 = 50 + outerR * Math.sin(a);
+    paths += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" opacity="${range(0.35, 0.55).toFixed(2)}"/>`;
+  }
+
+  // Inner polygon (triangle, square, pentagon, hexagon)
+  if (hasInnerPolygon) {
+    const sides = pick([3, 4, 5, 6]);
+    const polyR = range(10, 18);
+    const polyRot = range(0, 360);
+    const pts = Array.from({length: sides}, (_, i) => {
+      const a = (polyRot + i * 360 / sides) * Math.PI / 180;
+      return `${(50 + polyR * Math.cos(a)).toFixed(1)},${(50 + polyR * Math.sin(a)).toFixed(1)}`;
+    }).join(' ');
+    paths += `<polygon points="${pts}" opacity="${range(0.4, 0.6).toFixed(2)}"/>`;
+  }
+
+  // Orbit dots
+  if (hasOrbitDots) {
+    const dotCount = pick([4, 6, 8]);
+    const dotR = range(20, 32);
+    const dotRot = range(0, 360);
+    for (let i = 0; i < dotCount; i++) {
+      const a = (dotRot + i * 360 / dotCount) * Math.PI / 180;
+      const x = 50 + dotR * Math.cos(a), y = 50 + dotR * Math.sin(a);
+      paths += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${range(1.5, 3).toFixed(1)}" opacity="${range(0.4, 0.6).toFixed(2)}"/>`;
+    }
+  }
+
+  // Petal arcs
+  if (hasPetals) {
+    const petalCount = pick([4, 6, 8]);
+    const petalR = range(14, 24);
+    const petalRot = range(0, 360);
+    for (let i = 0; i < petalCount; i++) {
+      const a = (petalRot + i * 360 / petalCount) * Math.PI / 180;
+      const a2 = (petalRot + i * 360 / petalCount + 30) * Math.PI / 180;
+      const x1 = 50 + petalR * 0.5 * Math.cos(a), y1 = 50 + petalR * 0.5 * Math.sin(a);
+      const cx1 = 50 + petalR * Math.cos((a + a2) / 2 + 0.3), cy1 = 50 + petalR * Math.sin((a + a2) / 2 + 0.3);
+      const x2 = 50 + petalR * 0.5 * Math.cos(a2), y2 = 50 + petalR * 0.5 * Math.sin(a2);
+      paths += `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} Q${cx1.toFixed(1)},${cy1.toFixed(1)} ${x2.toFixed(1)},${y2.toFixed(1)}" opacity="${range(0.35, 0.55).toFixed(2)}"/>`;
+    }
+  }
+
+  // Diamond accents on outer ring
+  if (hasDiamonds) {
+    const dCount = pick([4, 6, 8]);
+    const dR = range(32, 40);
+    const dRot = range(0, 360);
+    const dSize = range(2, 3.5);
+    for (let i = 0; i < dCount; i++) {
+      const a = (dRot + i * 360 / dCount) * Math.PI / 180;
+      const x = 50 + dR * Math.cos(a), y = 50 + dR * Math.sin(a);
+      paths += `<path d="M${(x-dSize).toFixed(1)},${y.toFixed(1)} L${x.toFixed(1)},${(y-dSize).toFixed(1)} L${(x+dSize).toFixed(1)},${y.toFixed(1)} L${x.toFixed(1)},${(y+dSize).toFixed(1)}Z" opacity="${range(0.4, 0.6).toFixed(2)}"/>`;
+    }
+  }
+
+  return `<svg class="card-mandala" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="0.8">${paths}</svg>`;
+}
+
 const CARD_COUNT = ANSWERS.length;
 
 // State
@@ -441,7 +522,7 @@ function createCardEl(index) {
     <div class="card-inner">
       <div class="card-face card-back${isBlack ? ' card-back-orange' : ''}">
         <span class="card-corner tl">${answer.symbol}</span>
-        ${MANDALA_SVG}
+        ${generateMandala(index)}
         <span class="card-corner br">${answer.symbol}</span>
       </div>
       <div class="card-face card-front">
