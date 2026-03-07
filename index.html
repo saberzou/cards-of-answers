@@ -225,7 +225,7 @@
     position: fixed;
     inset: 0;
     z-index: 500;
-    background: #141414;
+    background: rgba(20,20,20,0.8);
     opacity: 0;
     transition: opacity 0.4s ease;
     pointer-events: none;
@@ -597,6 +597,7 @@ function pickCard(index) {
   // Show backdrop blur
   const overlay = document.getElementById('pickOverlay');
   overlay.classList.add('active');
+  document.getElementById('cardStage').style.visibility = 'hidden';
 
   // Dim other cards
   cardEls.forEach((other, i) => {
@@ -643,6 +644,7 @@ function putBackCard(callback) {
 
   // Restore other cards
   document.getElementById('pickOverlay').classList.remove('active');
+  document.getElementById('cardStage').style.visibility = 'visible';
   cardEls.forEach((other) => {
     other.style.pointerEvents = 'auto';
   });
