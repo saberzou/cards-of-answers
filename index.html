@@ -583,10 +583,12 @@ function pickCard(index) {
   const cw = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
   const ch = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
 
-  // Scale up and center
+  // Scale up and center — reparent to body so it's above the blur overlay
   const scale = Math.min(window.innerWidth / cw * 0.35, 2);
+  document.body.appendChild(el);
   el.classList.add('picking');
   el.style.zIndex = 600;
+  el.style.position = 'fixed';
   el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
   el.style.transform = `translate(${cx - cw/2}px, ${cy - ch/2}px) scale(${scale}) rotate(0deg)`;
 
@@ -630,6 +632,9 @@ function putBackCard(callback) {
   const pos = cardOrbitPos(order, CARD_COUNT, orbitAngle, params);
 
   el.classList.remove('flipped', 'picking');
+  el.style.position = 'absolute';
+  // Reparent back to stage
+  document.getElementById('cardStage').appendChild(el);
   el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
   el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rot}deg) scale(${pos.scale})`;
   el.style.zIndex = pos.z;
