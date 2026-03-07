@@ -485,10 +485,7 @@ function getOrbitParams() {
 }
 
 function cardOrbitPos(order, n, angle, params) {
-  // Pre-warp: front cards (closer/bigger) get more angular room
-  const baseTheta = angle + (order / n) * Math.PI * 2;
-  const preDepth = Math.sin(baseTheta);
-  const theta = baseTheta + preDepth * 0.04 * Math.PI * 2;
+  const theta = angle + (order / n) * Math.PI * 2;
   const x = params.cx + Math.cos(theta) * params.rx;
   const y = params.cy + Math.sin(theta) * params.ry;
   const depth = Math.sin(theta); // -1 (back) to 1 (front)
