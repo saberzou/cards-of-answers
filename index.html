@@ -337,9 +337,81 @@
     .card-front { padding: 8px 6px; }
     .card-front-symbol { width: 18px; height: 18px; }
   }
+  /* Loading screen */
+  #loadingScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: var(--charcoal);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    transition: opacity 0.6s ease;
+  }
+  #loadingScreen.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .loader-cards {
+    width: 80px;
+    height: 110px;
+    position: relative;
+  }
+  .loader-card {
+    position: absolute;
+    width: 50px;
+    height: 72px;
+    border-radius: 6px;
+    background: var(--cream);
+    border: 1.5px solid rgba(154,149,144,0.3);
+    left: 50%;
+    top: 50%;
+    transform-origin: center;
+  }
+  .loader-card:nth-child(1) {
+    animation: loaderShuffle1 1.2s ease-in-out infinite;
+  }
+  .loader-card:nth-child(2) {
+    animation: loaderShuffle2 1.2s ease-in-out infinite;
+  }
+  .loader-card:nth-child(3) {
+    animation: loaderShuffle3 1.2s ease-in-out infinite;
+  }
+  @keyframes loaderShuffle1 {
+    0%, 100% { transform: translate(-50%, -50%) rotate(-8deg); z-index: 1; }
+    33% { transform: translate(-50%, -70%) rotate(-20deg); z-index: 3; }
+    66% { transform: translate(-50%, -50%) rotate(-8deg); z-index: 1; }
+  }
+  @keyframes loaderShuffle2 {
+    0%, 100% { transform: translate(-50%, -50%) rotate(0deg); z-index: 2; }
+    33% { transform: translate(-50%, -50%) rotate(0deg); z-index: 1; }
+    66% { transform: translate(-50%, -30%) rotate(12deg); z-index: 3; }
+  }
+  @keyframes loaderShuffle3 {
+    0%, 100% { transform: translate(-50%, -50%) rotate(6deg); z-index: 3; }
+    33% { transform: translate(-50%, -50%) rotate(6deg); z-index: 2; }
+    66% { transform: translate(-50%, -50%) rotate(6deg); z-index: 2; }
+  }
+  .loader-text {
+    font-family: 'Goudy Bookletter 1911', serif;
+    color: var(--cream);
+    font-size: 14px;
+    opacity: 0.5;
+    letter-spacing: 2px;
+  }
 </style>
 </head>
 <body>
+<div id="loadingScreen">
+  <div class="loader-cards">
+    <div class="loader-card"></div>
+    <div class="loader-card"></div>
+    <div class="loader-card"></div>
+  </div>
+  <div class="loader-text">SHUFFLING THE DECK</div>
+</div>
 
 <div id="snowCanvas"></div>
 
@@ -559,9 +631,12 @@ function createCardEl(index) {
   `;
 
   // Set card back illustration
-  const CARD_BACKS = ['images/card-courage.png', 'images/card-wisdom.png', 'images/card-love.png', 'images/card-mystery.png'];
   const backEl = wrapper.querySelector('.card-back');
-  backEl.style.backgroundImage = `url(${CARD_BACKS[index % CARD_BACKS.length]})`;
+  if (window._CARD_BACKS && window._CARD_BACKS[index]) {
+    backEl.style.backgroundImage = `url(${window._CARD_BACKS[index]})`;
+  } else if (window._CARD_BACKS) {
+    backEl.style.backgroundImage = `url(${window._CARD_BACKS[index % window._CARD_BACKS.length]})`;
+  }
 
   wrapper.addEventListener('click', () => onCardClick(index));
 
@@ -580,16 +655,38 @@ function createCardEl(index) {
 }
 
 function init() {
-  // Create all card elements
-  for (let i = 0; i < CARD_COUNT; i++) {
-    const el = createCardEl(i);
-    stage.appendChild(el);
-    cardEls.push(el);
-    deckOrder.push(i);
-  }
-  // Position as deck
-  positionAsDeck(false);
-  initSnow();
+  // Preload card back images, then reveal
+  const CARD_BACKS = ['images/card-courage.png', 'images/card-wisdom.png', 'images/card-love.png', 'images/card-mystery.png',
+    'images/card-patience.png', 'images/card-truth.png', 'images/card-change.png', 'images/card-action.png',
+    'images/card-solitude.png', 'images/card-fate.png', 'images/card-hope.png', 'images/card-doubt.png',
+    'images/card-growth.png', 'images/card-time.png', 'images/card-joy.png', 'images/card-focus.png',
+    'images/card-release.png', 'images/card-risk.png', 'images/card-rest.png', 'images/card-connection.png',
+    'images/card-clarity.png', 'images/card-acceptance.png', 'images/card-ambition.png', 'images/card-gratitude.png'];
+  window._CARD_BACKS = CARD_BACKS;
+
+  const imagePromises = CARD_BACKS.map(src => new Promise(resolve => {
+    const img = new Image();
+    img.onload = resolve;
+    img.onerror = resolve; // don't block on missing images
+    img.src = src;
+  }));
+
+  Promise.all(imagePromises).then(() => {
+    // Create all card elements
+    for (let i = 0; i < CARD_COUNT; i++) {
+      const el = createCardEl(i);
+      stage.appendChild(el);
+      cardEls.push(el);
+      deckOrder.push(i);
+    }
+    positionAsDeck(false);
+    initSnow();
+
+    // Fade out loading screen
+    const loader = document.getElementById('loadingScreen');
+    loader.classList.add('hidden');
+    setTimeout(() => loader.remove(), 600);
+  });
 }
 
 // --- Deck position (stacked center) ---
