@@ -485,16 +485,16 @@ function getOrbitParams() {
 }
 
 function cardOrbitPos(order, n, angle, params) {
-  // Compensate for perspective: spread cards more at front, tighter at back
-  const t = order / n;
-  const theta = angle + (t + 0.06 * Math.sin(t * Math.PI * 2)) * Math.PI * 2;
+  // Pre-warp: front cards (closer/bigger) get more angular room
+  const baseTheta = angle + (order / n) * Math.PI * 2;
+  const preDepth = Math.sin(baseTheta);
+  const theta = baseTheta + preDepth * 0.04 * Math.PI * 2;
   const x = params.cx + Math.cos(theta) * params.rx;
   const y = params.cy + Math.sin(theta) * params.ry;
   const depth = Math.sin(theta); // -1 (back) to 1 (front)
-  // Scale slightly by depth for perspective
   const scale = 0.75 + depth * 0.25;
-  const rot = Math.cos(theta) * -6; // tilt cards along orbit
-  const z = Math.round((depth + 1) * 100); // zIndex
+  const rot = Math.cos(theta) * -6;
+  const z = Math.round((depth + 1) * 100);
   return { x, y, scale, rot, z, depth };
 }
 
