@@ -777,27 +777,23 @@ function shuffleDeck() {
 
   // If fanned, gather back first
   if (pickedIndex >= 0) {
-    // Close picked card first
     cardEls[pickedIndex].classList.remove('flipped', 'picking');
     pickedIndex = -1;
   }
 
   const gatherDuration = state === 'deck' ? 0 : 500;
 
-  // Gather cards to center
   positionAsDeck(true);
 
   setTimeout(() => {
-    doRiffles(0, 3, () => {
-      // Shuffle the order
+    doRiffles(0, 2, () => {
       for (let i = deckOrder.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [deckOrder[i], deckOrder[j]] = [deckOrder[j], deckOrder[i]];
       }
-      // Fan out
-      setTimeout(() => fanOut(), 200);
+      setTimeout(() => fanOut(), 150);
     });
-  }, gatherDuration + 300);
+  }, gatherDuration + 200);
 }
 
 function doRiffles(count, total, callback) {
@@ -808,22 +804,22 @@ function doRiffles(count, total, callback) {
   const cw = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
   const ch = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
   const half = Math.floor(CARD_COUNT / 2);
+  const speed = count === 0 ? 0.14 : 0.1; // faster each pass
 
   // Split left/right
   cardEls.forEach((el, i) => {
     const order = deckOrder.indexOf(i);
     const isLeft = order < half;
-    const spread = isLeft ? -60 : 60;
-    const lift = -20 - Math.random() * 10;
-    const rot = isLeft ? -8 : 8;
+    const spread = isLeft ? -50 : 50;
+    const lift = -15 - Math.random() * 8;
+    const rot = isLeft ? -6 : 6;
 
-    el.style.transition = 'transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)';
-    el.style.transform = `translate(${cx - cw/2 + spread}px, ${cy - ch/2 + lift}px) rotate(${rot}deg)`;
+    el.style.transition = `transform ${speed}s cubic-bezier(0.4, 0, 0.2, 1)`;
+    el.style.transform = `translate3d(${cx - cw/2 + spread}px, ${cy - ch/2 + lift}px, 0) rotate(${rot}deg)`;
   });
 
   // Interleave back
   setTimeout(() => {
-    // Interleave deckOrder
     const left = deckOrder.slice(0, half);
     const right = deckOrder.slice(half);
     const merged = [];
@@ -839,12 +835,12 @@ function doRiffles(count, total, callback) {
       const order = deckOrder.indexOf(i);
       const offsetY = -order * 0.4;
       el.style.zIndex = order;
-      el.style.transition = 'transform 0.18s cubic-bezier(0.4, 0, 0.2, 1)';
-      el.style.transform = `translate(${cx - cw/2}px, ${cy - ch/2 + offsetY}px) rotate(${(Math.random()-0.5)*2}deg)`;
+      el.style.transition = `transform ${speed}s cubic-bezier(0.4, 0, 0.2, 1)`;
+      el.style.transform = `translate3d(${cx - cw/2}px, ${cy - ch/2 + offsetY}px, 0) rotate(${(Math.random()-0.5)*2}deg)`;
     });
 
-    setTimeout(() => doRiffles(count + 1, total, callback), 220);
-  }, 200);
+    setTimeout(() => doRiffles(count + 1, total, callback), speed * 1000 + 60);
+  }, speed * 1000 + 40);
 }
 
 // --- Orbit ring ---
@@ -889,7 +885,7 @@ function fanOut() {
     const pos = cardOrbitPos(order, CARD_COUNT, orbitAngle, params);
     el.style.transition = `transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${order * 20}ms, opacity 0.4s ease`;
     el.style.zIndex = pos.z;
-    el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rot}deg) scale(${pos.scale})`;
+    el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) rotate(${pos.rot}deg) scale(${pos.scale})`;
     el.style.opacity = '1';
     el.style.pointerEvents = 'auto';
   });
@@ -915,7 +911,7 @@ function startOrbit() {
       const pos = cardOrbitPos(order, CARD_COUNT, orbitAngle, params);
       el.style.transition = 'none';
       el.style.zIndex = pos.z;
-      el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rot}deg) scale(${pos.scale})`;
+      el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) rotate(${pos.rot}deg) scale(${pos.scale})`;
       el.style.filter = `drop-shadow(0 ${4 + pos.depth * 8}px ${10 + pos.depth * 12}px rgba(0,0,0,${(0.25 + pos.depth * 0.2).toFixed(2)}))`;
       el.style.opacity = '1';
     });
@@ -1036,7 +1032,7 @@ function putBackCard(callback) {
   // Reparent back to stage
   document.getElementById('cardStage').appendChild(el);
   el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
-  el.style.transform = `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rot}deg) scale(${pos.scale})`;
+  el.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) rotate(${pos.rot}deg) scale(${pos.scale})`;
   el.style.zIndex = pos.z;
 
   // Restore other cards
