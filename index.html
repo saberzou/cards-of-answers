@@ -556,8 +556,11 @@ function createCardEl(index) {
   const wm = wrapper.querySelector('.card-watermark');
   const iconSvg = CATEGORY_ICONS[answer.category];
   if (wm && iconSvg) {
-    const encoded = encodeURIComponent(iconSvg.replace(/currentColor/g, '#c8b8a0'));
-    wm.style.backgroundImage = `url("data:image/svg+xml,${encoded}")`;
+    const fullSvg = iconSvg
+      .replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" ')
+      .replace(/currentColor/g, '#c8b8a0');
+    const b64 = btoa(fullSvg);
+    wm.style.backgroundImage = `url("data:image/svg+xml;base64,${b64}")`;
   }
 
   return wrapper;
