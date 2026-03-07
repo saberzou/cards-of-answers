@@ -223,10 +223,10 @@
     position: absolute;
     inset: -50%;
     transform: rotate(-30deg);
-    opacity: 0.06;
+    opacity: 0.04;
     pointer-events: none;
     background-repeat: repeat;
-    background-size: 36px 36px;
+    background-size: 56px 56px;
     z-index: 0;
   }
   .card-front-symbol, .card-category, .card-answer {
@@ -557,7 +557,7 @@ function createCardEl(index) {
   const iconSvg = CATEGORY_ICONS[answer.category];
   if (wm && iconSvg) {
     const fullSvg = iconSvg
-      .replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" ')
+      .replace('<svg ', '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" ')
       .replace(/currentColor/g, '#c8b8a0');
     const b64 = btoa(fullSvg);
     wm.style.backgroundImage = `url("data:image/svg+xml;base64,${b64}")`;
