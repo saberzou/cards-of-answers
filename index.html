@@ -584,7 +584,9 @@ function pickCard(index) {
   const ch = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
 
   // Scale up and center — reparent to body so it's above the blur overlay
-  const scale = Math.min(window.innerWidth / cw * 0.35, 2);
+  const maxW = window.innerWidth * 0.8;
+  const maxH = window.innerHeight * 0.7;
+  const scale = Math.min(maxW / cw, maxH / ch, 2.5);
 
   // Capture current orbit position before reparenting
   const rect = el.getBoundingClientRect();
