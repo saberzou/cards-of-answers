@@ -189,13 +189,11 @@
     width: 80%;
     max-width: 140px;
     color: var(--accent);
-    opacity: 0.8;
-    filter: drop-shadow(0 0 6px rgba(232,100,30,0.2));
+    opacity: 1;
     z-index: 1;
   }
   .card-back-orange .card-mandala {
-    color: rgba(120, 40, 0, 0.6);
-    filter: none;
+    color: rgba(90, 20, 0, 0.9);
   }
   .card-corner {
     position: absolute;
@@ -394,26 +392,26 @@ const CATEGORY_ICONS = {
 };
 
 // SVG mandala for card back
-const MANDALA_SVG = `<svg class="card-mandala" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="0.5">
-  <circle cx="50" cy="50" r="42" opacity="0.3"/>
-  <circle cx="50" cy="50" r="30" opacity="0.25"/>
-  <circle cx="50" cy="50" r="18" opacity="0.3"/>
-  <circle cx="50" cy="50" r="6" opacity="0.4"/>
+const MANDALA_SVG = `<svg class="card-mandala" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="0.8">
+  <circle cx="50" cy="50" r="42" opacity="0.6"/>
+  <circle cx="50" cy="50" r="30" opacity="0.5"/>
+  <circle cx="50" cy="50" r="18" opacity="0.6"/>
+  <circle cx="50" cy="50" r="6" opacity="0.7"/>
   ${Array.from({length: 12}, (_, i) => {
     const a = i * 30 * Math.PI / 180;
     const x1 = 50 + 6 * Math.cos(a), y1 = 50 + 6 * Math.sin(a);
     const x2 = 50 + 42 * Math.cos(a), y2 = 50 + 42 * Math.sin(a);
-    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" opacity="0.2"/>`;
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" opacity="0.45"/>`;
   }).join('')}
   ${Array.from({length: 6}, (_, i) => {
     const a = i * 60 * Math.PI / 180;
     const x = 50 + 24 * Math.cos(a), y = 50 + 24 * Math.sin(a);
-    return `<circle cx="${x}" cy="${y}" r="3" opacity="0.2"/>`;
+    return `<circle cx="${x}" cy="${y}" r="3" opacity="0.45"/>`;
   }).join('')}
   ${Array.from({length: 8}, (_, i) => {
     const a = (i * 45 + 22.5) * Math.PI / 180;
     const x = 50 + 36 * Math.cos(a), y = 50 + 36 * Math.sin(a);
-    return `<path d="M${x-2},${y} L${x},${y-2} L${x+2},${y} L${x},${y+2}Z" opacity="0.25"/>`;
+    return `<path d="M${x-2},${y} L${x},${y-2} L${x+2},${y} L${x},${y+2}Z" opacity="0.5"/>`;
   }).join('')}
 </svg>`;
 const CARD_COUNT = ANSWERS.length;
