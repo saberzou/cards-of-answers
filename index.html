@@ -150,6 +150,8 @@
   /* Card back */
   .card-back {
     background: var(--cream);
+    background-size: cover;
+    background-position: center;
     border: 1.5px solid rgba(154,149,144,0.3);
     display: flex;
     align-items: center;
@@ -157,7 +159,9 @@
     flex-direction: column;
   }
   .card-back-orange {
-    background: var(--accent);
+    background-color: var(--accent);
+    background-size: cover;
+    background-position: center;
   }
   .card-back-orange .card-symbol,
   .card-back-orange .card-corner {
@@ -169,6 +173,7 @@
     inset: 6px;
     border: 1px solid rgba(232,100,30,0.2);
     border-radius: 7px;
+    display: none;
   }
   .card-back::after {
     content: '';
@@ -176,6 +181,7 @@
     inset: 12px;
     border: 1px solid rgba(232,176,32,0.15);
     border-radius: 5px;
+    display: none;
   }
   .card-symbol {
     font-size: 64px;
@@ -191,6 +197,7 @@
     color: var(--accent);
     opacity: 1;
     z-index: 1;
+    display: none;
   }
   .card-back-orange .card-mandala {
     color: rgba(90, 20, 0, 0.9);
@@ -201,6 +208,7 @@
     font-size: 10px;
     color: var(--accent-light);
     opacity: 0.5;
+    display: none;
   }
   .card-corner.tl { top: 14px; left: 14px; }
   .card-corner.br { bottom: 14px; right: 14px; transform: rotate(180deg); }
@@ -549,6 +557,11 @@ function createCardEl(index) {
       </div>
     </div>
   `;
+
+  // Set card back illustration
+  const CARD_BACKS = ['images/card-courage.png', 'images/card-wisdom.png', 'images/card-love.png', 'images/card-mystery.png'];
+  const backEl = wrapper.querySelector('.card-back');
+  backEl.style.backgroundImage = `url(${CARD_BACKS[index % CARD_BACKS.length]})`;
 
   wrapper.addEventListener('click', () => onCardClick(index));
 
