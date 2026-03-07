@@ -183,6 +183,19 @@
     opacity: 0.8;
     filter: drop-shadow(0 0 8px rgba(232,100,30,0.3));
     z-index: 1;
+    display: none;
+  }
+  .card-mandala {
+    width: 80%;
+    max-width: 140px;
+    color: var(--accent);
+    opacity: 0.8;
+    filter: drop-shadow(0 0 6px rgba(232,100,30,0.2));
+    z-index: 1;
+  }
+  .card-back-orange .card-mandala {
+    color: var(--cream);
+    filter: drop-shadow(0 0 6px rgba(255,255,255,0.15));
   }
   .card-corner {
     position: absolute;
@@ -216,9 +229,14 @@
     margin-bottom: 12px;
   }
   .card-front-symbol {
-    font-size: 32px;
+    width: 32px;
+    height: 32px;
     color: var(--accent);
     margin-bottom: 4px;
+  }
+  .card-front-symbol svg {
+    width: 100%;
+    height: 100%;
   }
   .card-answer {
     font-family: 'Goudy Bookletter 1911', serif;
@@ -280,7 +298,7 @@
     .card-category { font-size: 6px; margin-bottom: 6px; }
     .card-number { font-size: 7px; bottom: 8px; }
     .card-front { padding: 12px 8px; }
-    .card-front-symbol { font-size: 24px; }
+    .card-front-symbol { width: 24px; height: 24px; }
   }
 
   @media (max-width: 480px) {
@@ -295,7 +313,7 @@
     .card-answer { font-size: 8px; }
     .card-category { font-size: 5px; margin-bottom: 4px; }
     .card-front { padding: 8px 6px; }
-    .card-front-symbol { font-size: 18px; }
+    .card-front-symbol { width: 18px; height: 18px; }
   }
 </style>
 </head>
@@ -346,6 +364,58 @@ const ANSWERS = [
 ];
 
 const SYMBOLS = ["✦", "◈", "✧", "⬥", "❖", "☽", "✶", "⊕"];
+
+// Category-specific SVG icons (small, elegant line art)
+const CATEGORY_ICONS = {
+  Courage:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.09 6.26L21 9.27l-5 3.9L17.18 22 12 18.27 6.82 22 8 13.17l-5-3.9 6.91-1.01z"/></svg>`,
+  Patience:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
+  Truth:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="10"/></svg>`,
+  Change:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 014-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>`,
+  Love:       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/></svg>`,
+  Action:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+  Wisdom:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  Solitude:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>`,
+  Fate:       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 22a10 10 0 100-20 10 10 0 000 20z"/><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg>`,
+  Hope:       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`,
+  Doubt:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>`,
+  Growth:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 22V8"/><path d="M5 12l7-7 7 7"/><path d="M8 18c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>`,
+  Time:       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 00-.586-1.414L12 12l-4.414 4.414A2 2 0 007 17.828V22"/><path d="M7 2v4.172a2 2 0 00.586 1.414L12 12l4.414-4.414A2 2 0 0017 6.172V2"/></svg>`,
+  Joy:        `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M9 11l2 2 6-6"/></svg>`,
+  Focus:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,
+  Release:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/><circle cx="12" cy="12" r="10"/></svg>`,
+  Risk:       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 2L2 19h20L12 2z"/><path d="M12 9v4"/><circle cx="12" cy="16" r=".5" fill="currentColor"/></svg>`,
+  Rest:       `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M17 18a5 5 0 00-10 0"/><path d="M12 9V2"/><path d="M4.22 10.22l1.42 1.42M18.36 10.22l-1.42 1.42M1 18h22"/></svg>`,
+  Connection: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>`,
+  Clarity:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>`,
+  Acceptance: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>`,
+  Ambition:   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 20l5.5-5.5"/><path d="M14.5 3.5l6 6"/><path d="M21 3l-7 7"/><circle cx="14" cy="14" r="7"/></svg>`,
+  Gratitude:  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+  Mystery:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M12 3a6 6 0 016 6c0 3-2 4-3.5 5.5S12 17 12 19"/><circle cx="12" cy="22" r=".5" fill="currentColor"/></svg>`,
+};
+
+// SVG mandala for card back
+const MANDALA_SVG = `<svg class="card-mandala" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="0.5">
+  <circle cx="50" cy="50" r="42" opacity="0.3"/>
+  <circle cx="50" cy="50" r="30" opacity="0.25"/>
+  <circle cx="50" cy="50" r="18" opacity="0.3"/>
+  <circle cx="50" cy="50" r="6" opacity="0.4"/>
+  ${Array.from({length: 12}, (_, i) => {
+    const a = i * 30 * Math.PI / 180;
+    const x1 = 50 + 6 * Math.cos(a), y1 = 50 + 6 * Math.sin(a);
+    const x2 = 50 + 42 * Math.cos(a), y2 = 50 + 42 * Math.sin(a);
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" opacity="0.2"/>`;
+  }).join('')}
+  ${Array.from({length: 6}, (_, i) => {
+    const a = i * 60 * Math.PI / 180;
+    const x = 50 + 24 * Math.cos(a), y = 50 + 24 * Math.sin(a);
+    return `<circle cx="${x}" cy="${y}" r="3" opacity="0.2"/>`;
+  }).join('')}
+  ${Array.from({length: 8}, (_, i) => {
+    const a = (i * 45 + 22.5) * Math.PI / 180;
+    const x = 50 + 36 * Math.cos(a), y = 50 + 36 * Math.sin(a);
+    return `<path d="M${x-2},${y} L${x},${y-2} L${x+2},${y} L${x},${y+2}Z" opacity="0.25"/>`;
+  }).join('')}
+</svg>`;
 const CARD_COUNT = ANSWERS.length;
 
 // State
@@ -373,11 +443,11 @@ function createCardEl(index) {
     <div class="card-inner">
       <div class="card-face card-back${isBlack ? ' card-back-orange' : ''}">
         <span class="card-corner tl">${answer.symbol}</span>
-        <span class="card-symbol">${sym}</span>
+        ${MANDALA_SVG}
         <span class="card-corner br">${answer.symbol}</span>
       </div>
       <div class="card-face card-front">
-        <span class="card-front-symbol">${sym}</span>
+        <span class="card-front-symbol">${CATEGORY_ICONS[answer.category] || sym}</span>
         <span class="card-category">${answer.category}</span>
         <span class="card-answer">"${answer.answer}"</span>
       </div>
@@ -426,9 +496,69 @@ function positionAsDeck(animate) {
 }
 
 // --- Shuffle animation ---
+// --- Sound effects (Web Audio API, no external files) ---
+let audioCtx;
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playShuffleSound() {
+  const ctx = getAudioCtx();
+  // Rapid soft clicks to simulate card riffle
+  for (let i = 0; i < 8; i++) {
+    const t = ctx.currentTime + i * 0.06;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'highpass';
+    filter.frequency.value = 2000 + Math.random() * 2000;
+    osc.type = 'triangle';
+    osc.frequency.value = 800 + Math.random() * 600;
+    gain.gain.setValueAtTime(0.03, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+    osc.connect(filter).connect(gain).connect(ctx.destination);
+    osc.start(t);
+    osc.stop(t + 0.04);
+  }
+}
+
+function playFlipSound() {
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(600, t);
+  osc.frequency.exponentialRampToValueAtTime(1200, t + 0.08);
+  gain.gain.setValueAtTime(0.06, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+  osc.connect(gain).connect(ctx.destination);
+  osc.start(t);
+  osc.stop(t + 0.15);
+}
+
+function playRevealChime() {
+  const ctx = getAudioCtx();
+  const t = ctx.currentTime;
+  [523, 659, 784].forEach((freq, i) => {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    const start = t + i * 0.12;
+    gain.gain.setValueAtTime(0.04, start);
+    gain.gain.exponentialRampToValueAtTime(0.001, start + 0.5);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start + 0.5);
+  });
+}
+
 function shuffleDeck() {
   if (state === 'shuffling') return;
   state = 'shuffling';
+  playShuffleSound();
   shuffleBtn.classList.add('disabled');
 
   // If fanned, gather back first
@@ -654,6 +784,8 @@ function pickCard(index) {
   // Auto-flip after pop
   setTimeout(() => {
     el.classList.add('flipped');
+    playFlipSound();
+    setTimeout(playRevealChime, 300);
   }, 350);
 
   // Click outside to close
