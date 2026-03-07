@@ -638,7 +638,9 @@ function pickCard(index) {
     setTimeout(() => {
       el.style.transition = 'none';
       el.style.zoom = scale;
-      el.style.transform = `translate(${(cx - cw*scale/2) / scale}px, ${(cy - ch*scale/2) / scale}px) rotate(${tilt}deg)`;
+      const tx = Math.round((cx - cw*scale/2) / scale);
+      const ty = Math.round((cy - ch*scale/2) / scale);
+      el.style.transform = `translate(${tx}px, ${ty}px) rotate(${tilt}deg)`;
     }, 650);
   });
 
