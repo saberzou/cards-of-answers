@@ -786,14 +786,14 @@ function shuffleDeck() {
   positionAsDeck(true);
 
   setTimeout(() => {
-    doRiffles(0, 2, () => {
+    doRiffles(0, 3, () => {
       for (let i = deckOrder.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [deckOrder[i], deckOrder[j]] = [deckOrder[j], deckOrder[i]];
       }
-      setTimeout(() => fanOut(), 150);
+      setTimeout(() => fanOut(), 200);
     });
-  }, gatherDuration + 200);
+  }, gatherDuration + 300);
 }
 
 function doRiffles(count, total, callback) {
@@ -804,15 +804,15 @@ function doRiffles(count, total, callback) {
   const cw = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w'));
   const ch = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-h'));
   const half = Math.floor(CARD_COUNT / 2);
-  const speed = count === 0 ? 0.14 : 0.1; // faster each pass
+  const speed = 0.14;
 
   // Split left/right
   cardEls.forEach((el, i) => {
     const order = deckOrder.indexOf(i);
     const isLeft = order < half;
-    const spread = isLeft ? -50 : 50;
-    const lift = -15 - Math.random() * 8;
-    const rot = isLeft ? -6 : 6;
+    const spread = isLeft ? -60 : 60;
+    const lift = -20 - Math.random() * 10;
+    const rot = isLeft ? -8 : 8;
 
     el.style.transition = `transform ${speed}s cubic-bezier(0.4, 0, 0.2, 1)`;
     el.style.transform = `translate3d(${cx - cw/2 + spread}px, ${cy - ch/2 + lift}px, 0) rotate(${rot}deg)`;
@@ -839,8 +839,8 @@ function doRiffles(count, total, callback) {
       el.style.transform = `translate3d(${cx - cw/2}px, ${cy - ch/2 + offsetY}px, 0) rotate(${(Math.random()-0.5)*2}deg)`;
     });
 
-    setTimeout(() => doRiffles(count + 1, total, callback), speed * 1000 + 60);
-  }, speed * 1000 + 40);
+    setTimeout(() => doRiffles(count + 1, total, callback), 220);
+  }, 200);
 }
 
 // --- Orbit ring ---
