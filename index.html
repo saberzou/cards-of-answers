@@ -587,7 +587,7 @@ function pickCard(index) {
   // Scale up and center
   const scale = Math.min(window.innerWidth / cw * 0.35, 2);
   el.classList.add('picking');
-  el.style.zIndex = 999;
+  el.style.zIndex = 600;
   el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';
   el.style.transform = `translate(${cx - cw/2}px, ${cy - ch/2}px) scale(${scale}) rotate(0deg)`;
 
