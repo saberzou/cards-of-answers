@@ -121,6 +121,7 @@
     perspective: 800px;
     -webkit-tap-highlight-color: transparent;
     will-change: transform;
+    contain: layout style paint;
   }
   .card-wrapper.picking {
     z-index: 600 !important;
@@ -145,6 +146,7 @@
     -webkit-backface-visibility: hidden;
     border-radius: 10px;
     overflow: hidden;
+    contain: layout style paint;
   }
 
   /* Card back */
@@ -650,12 +652,12 @@ function createCardEl(index) {
 
 function init() {
   // Preload card back images, then reveal
-  const CARD_BACKS = ['images/card-courage.png', 'images/card-wisdom.png', 'images/card-love.png', 'images/card-mystery.png',
-    'images/card-patience.png', 'images/card-truth.png', 'images/card-change.png', 'images/card-action.png',
-    'images/card-solitude.png', 'images/card-fate.png', 'images/card-hope.png', 'images/card-doubt.png',
-    'images/card-growth.png', 'images/card-time.png', 'images/card-joy.png', 'images/card-focus.png',
-    'images/card-release.png', 'images/card-risk.png', 'images/card-rest.png', 'images/card-connection.png',
-    'images/card-clarity.png', 'images/card-acceptance.png', 'images/card-ambition.png', 'images/card-gratitude.png'];
+  const CARD_BACKS = ['images/card-courage.webp', 'images/card-wisdom.webp', 'images/card-love.webp', 'images/card-mystery.webp',
+    'images/card-patience.webp', 'images/card-truth.webp', 'images/card-change.webp', 'images/card-action.webp',
+    'images/card-solitude.webp', 'images/card-fate.webp', 'images/card-hope.webp', 'images/card-doubt.webp',
+    'images/card-growth.webp', 'images/card-time.webp', 'images/card-joy.webp', 'images/card-focus.webp',
+    'images/card-release.webp', 'images/card-risk.webp', 'images/card-rest.webp', 'images/card-connection.webp',
+    'images/card-clarity.webp', 'images/card-acceptance.webp', 'images/card-ambition.webp', 'images/card-gratitude.webp'];
   window._CARD_BACKS = CARD_BACKS;
 
   const imagePromises = CARD_BACKS.map(src => new Promise(resolve => {
