@@ -126,7 +126,7 @@
     contain: layout style paint;
   }
   .card-wrapper.picking {
-    z-index: 600 !important;
+    z-index: 2000 !important;
     filter: none !important;
     opacity: 1 !important;
   }
@@ -289,7 +289,7 @@
   .pick-overlay {
     position: fixed;
     inset: 0;
-    z-index: 500;
+    z-index: 1500;
     background: rgba(20,20,20,0.8);
     opacity: 0;
     transition: opacity 0.4s ease;
@@ -871,7 +871,10 @@ function cardOrbitPos(order, n, angle, params) {
   const depth = Math.sin(theta); // -1 (back) to 1 (front)
   const scale = 0.75 + depth * 0.25;
   const rot = Math.cos(theta) * -6;
-  const z = Math.round((depth + 1) * 100);
+  // z-index: depth is primary. Add cos-based tiebreaker so cards at similar depths
+  // (near front center) don't pop — card approaching from right layers over card leaving left.
+  const cosT = Math.cos(theta);
+  const z = Math.round((depth + 1) * 500 + cosT * 10);
   return { x, y, scale, rot, z, depth };
 }
 
@@ -955,7 +958,7 @@ function pickCard(index) {
   const rect = el.getBoundingClientRect();
   document.body.appendChild(el);
   el.classList.add('picking');
-  el.style.zIndex = 600;
+  el.style.zIndex = 2000;
   el.style.position = 'fixed';
   el.style.filter = 'none';
   el.style.opacity = '1';
