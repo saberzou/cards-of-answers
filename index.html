@@ -867,13 +867,13 @@ function getOrbitParams() {
 function cardOrbitPos(order, n, angle, params) {
   const theta = angle + (order / n) * Math.PI * 2;
   // Pear-shaped orbit: rx grows when card is at front (sin > 0)
-  // This widens the arc at the bottom, spacing front cards apart naturally
-  const frontness = Math.max(0, Math.sin(theta)); // 0 at back, 1 at front center
-  const BULGE = 0.8; // how much wider the front arc is (80% extra radius)
-  const rx = params.rx * (1 + frontness * BULGE);
-  // Smile curve: deepen the vertical radius at front so center dips lower
-  const SMILE = 0.9; // 90% deeper at front center
-  const ry = params.ry * (1 + frontness * SMILE);
+  // Smooth pear shape: (sin+1)/2 gives 0 at back, 1 at front, no kinks
+  const frontness = (Math.sin(theta) + 1) / 2;
+  const fp = frontness * frontness; // concentrate effect toward front center
+  const BULGE = 0.8;
+  const rx = params.rx * (1 + fp * BULGE);
+  const SMILE = 0.9;
+  const ry = params.ry * (1 + fp * SMILE);
   const x = params.cx + Math.cos(theta) * rx;
   const y = params.cy + Math.sin(theta) * ry;
   const depth = Math.sin(theta);
