@@ -865,25 +865,15 @@ function getOrbitParams() {
 }
 
 function cardOrbitPos(order, n, angle, params) {
-  // Base angle for this card
-  const baseTheta = angle + (order / n) * Math.PI * 2;
-  // Normalize to [0, 2π)
-  let norm = ((baseTheta % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-  
-  // Push cards apart near the front (bottom of ellipse, θ ≈ π/2).
-  // Cards near front get extra angular spread, creating a gap so
-  // the center card doesn't overlap with its neighbors.
-  // "frontness" peaks at sin(θ)=1 (bottom center)
-  const frontness = Math.sin(baseTheta);
-  // Extra spread: cards in the front half get pushed outward from center
-  // This warps the uniform spacing to be wider at front, tighter at back
-  const SPREAD = 0.12; // radians of extra push at peak
-  const offset = frontness > 0 ? Math.cos(baseTheta) * SPREAD * frontness : 0;
-  const theta = baseTheta + offset;
-  
-  const x = params.cx + Math.cos(theta) * params.rx;
+  const theta = angle + (order / n) * Math.PI * 2;
+  // Pear-shaped orbit: rx grows when card is at front (sin > 0)
+  // This widens the arc at the bottom, spacing front cards apart naturally
+  const frontness = Math.max(0, Math.sin(theta)); // 0 at back, 1 at front center
+  const BULGE = 0.35; // how much wider the front arc is (35% extra radius)
+  const rx = params.rx * (1 + frontness * BULGE);
+  const x = params.cx + Math.cos(theta) * rx;
   const y = params.cy + Math.sin(theta) * params.ry;
-  const depth = Math.sin(theta); // -1 (back) to 1 (front)
+  const depth = Math.sin(theta);
   const scale = 0.75 + depth * 0.25;
   const rot = Math.cos(theta) * -6;
   const z = Math.round((depth + 1) * 500);
