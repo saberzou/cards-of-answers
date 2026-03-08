@@ -727,17 +727,31 @@ const ALL_ANSWERS = [
   { category: "Mystery", answer: "Leave room for surprise.", symbol: "♦" },
 ];
 
-// Active deck — 24 randomly selected answers
-let ANSWERS = ALL_ANSWERS.slice(0, 24);
+// Fixed category order matching card back illustrations
+const CARD_CATEGORIES = [
+  "Courage", "Wisdom", "Love", "Mystery", "Patience", "Truth", "Change", "Action",
+  "Solitude", "Fate", "Hope", "Doubt", "Growth", "Time", "Joy", "Focus",
+  "Release", "Risk", "Rest", "Connection", "Clarity", "Acceptance", "Ambition", "Gratitude"
+];
+
+// Active deck — one random answer per category, in card order
+let ANSWERS = CARD_CATEGORIES.map(cat =>
+  ALL_ANSWERS.filter(a => a.category === cat)[0]
+);
+
+// Build lookup: category → array of answers
+const ANSWERS_BY_CATEGORY = {};
+ALL_ANSWERS.forEach(a => {
+  if (!ANSWERS_BY_CATEGORY[a.category]) ANSWERS_BY_CATEGORY[a.category] = [];
+  ANSWERS_BY_CATEGORY[a.category].push(a);
+});
 
 function randomizeAnswers() {
-  // Fisher-Yates shuffle on a copy, pick first 24
-  const pool = [...ALL_ANSWERS];
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [pool[i], pool[j]] = [pool[j], pool[i]];
-  }
-  ANSWERS = pool.slice(0, 24);
+  // Pick one random answer per category, maintaining card order
+  ANSWERS = CARD_CATEGORIES.map(cat => {
+    const pool = ANSWERS_BY_CATEGORY[cat];
+    return pool[Math.floor(Math.random() * pool.length)];
+  });
   // Update card fronts
   cardEls.forEach((el, idx) => {
     const a = ANSWERS[idx];
