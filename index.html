@@ -636,8 +636,10 @@ function createCardEl(index) {
   `;
 
   wrapper.addEventListener('click', () => onCardClick(index));
-  wrapper.addEventListener('mouseenter', () => { orbitHovering = true; });
-  wrapper.addEventListener('mouseleave', () => { orbitHovering = false; });
+  if (window.matchMedia('(pointer: fine)').matches) {
+    wrapper.addEventListener('mouseenter', () => { orbitHovering = true; });
+    wrapper.addEventListener('mouseleave', () => { orbitHovering = false; });
+  }
 
   // Set watermark background from category icon SVG
   const wm = wrapper.querySelector('.card-watermark');
