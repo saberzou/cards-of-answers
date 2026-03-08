@@ -871,8 +871,11 @@ function cardOrbitPos(order, n, angle, params) {
   const frontness = Math.max(0, Math.sin(theta)); // 0 at back, 1 at front center
   const BULGE = 0.8; // how much wider the front arc is (80% extra radius)
   const rx = params.rx * (1 + frontness * BULGE);
+  // Smile curve: deepen the vertical radius at front so center dips lower
+  const SMILE = 0.5; // 50% deeper at front center
+  const ry = params.ry * (1 + frontness * SMILE);
   const x = params.cx + Math.cos(theta) * rx;
-  const y = params.cy + Math.sin(theta) * params.ry;
+  const y = params.cy + Math.sin(theta) * ry;
   const depth = Math.sin(theta);
   const scale = 0.7 + depth * 0.3;
   const rot = Math.cos(theta) * -6;
