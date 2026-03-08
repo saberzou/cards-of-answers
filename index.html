@@ -872,7 +872,7 @@ function cardOrbitPos(order, n, angle, params) {
   const BULGE = 0.8; // how much wider the front arc is (80% extra radius)
   const rx = params.rx * (1 + frontness * BULGE);
   // Smile curve: deepen the vertical radius at front so center dips lower
-  const SMILE = 0.5; // 50% deeper at front center
+  const SMILE = 0.9; // 90% deeper at front center
   const ry = params.ry * (1 + frontness * SMILE);
   const x = params.cx + Math.cos(theta) * rx;
   const y = params.cy + Math.sin(theta) * ry;
