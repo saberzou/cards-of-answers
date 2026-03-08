@@ -437,32 +437,325 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-const ANSWERS = [
+const ALL_ANSWERS = [
+  // Courage (♠)
   { category: "Courage", answer: "The thing you fear most is exactly what you must do.", symbol: "♠" },
+  { category: "Courage", answer: "Bravery is not the absence of fear — it's acting despite it.", symbol: "♠" },
+  { category: "Courage", answer: "You were not built for a safe life.", symbol: "♠" },
+  { category: "Courage", answer: "Say the thing you've been swallowing.", symbol: "♠" },
+  { category: "Courage", answer: "The cave you fear to enter holds the treasure you seek.", symbol: "♠" },
+  { category: "Courage", answer: "Comfort is where dreams go to die.", symbol: "♠" },
+  { category: "Courage", answer: "You already survived the hardest days. Keep going.", symbol: "♠" },
+  { category: "Courage", answer: "One brave conversation can change everything.", symbol: "♠" },
+  { category: "Courage", answer: "Leap. The net appears after you jump.", symbol: "♠" },
+  { category: "Courage", answer: "Your fear is a compass. Follow it.", symbol: "♠" },
+
+  // Patience (♣)
   { category: "Patience", answer: "Not yet. But soon.", symbol: "♣" },
+  { category: "Patience", answer: "The fruit isn't ripe. Wait.", symbol: "♣" },
+  { category: "Patience", answer: "Rushing won't make it bloom faster.", symbol: "♣" },
+  { category: "Patience", answer: "What's meant for you won't pass you by.", symbol: "♣" },
+  { category: "Patience", answer: "Sit with the discomfort. It's teaching you.", symbol: "♣" },
+  { category: "Patience", answer: "You're planting seeds. Trust the soil.", symbol: "♣" },
+  { category: "Patience", answer: "Slow progress is still progress.", symbol: "♣" },
+  { category: "Patience", answer: "Everything arrives exactly when it should.", symbol: "♣" },
+  { category: "Patience", answer: "Stop checking. It's growing in the dark.", symbol: "♣" },
+  { category: "Patience", answer: "The river reaches the sea without hurrying.", symbol: "♣" },
+
+  // Truth (♦)
   { category: "Truth", answer: "You already know the answer. Trust it.", symbol: "♦" },
+  { category: "Truth", answer: "Stop pretending you don't see it.", symbol: "♦" },
+  { category: "Truth", answer: "The truth doesn't need your approval.", symbol: "♦" },
+  { category: "Truth", answer: "What you deny controls you.", symbol: "♦" },
+  { category: "Truth", answer: "Honesty is expensive. But it's worth it.", symbol: "♦" },
+  { category: "Truth", answer: "The mirror doesn't lie. Neither should you.", symbol: "♦" },
+  { category: "Truth", answer: "Say it plainly. Clarity is kindness.", symbol: "♦" },
+  { category: "Truth", answer: "Your gut knows. Your mind argues.", symbol: "♦" },
+  { category: "Truth", answer: "The truth hurts once. A lie hurts forever.", symbol: "♦" },
+  { category: "Truth", answer: "Be honest about what you actually want.", symbol: "♦" },
+
+  // Change (♥)
   { category: "Change", answer: "What you're holding onto is holding you back.", symbol: "♥" },
+  { category: "Change", answer: "You've outgrown this. It's okay to leave.", symbol: "♥" },
+  { category: "Change", answer: "The old version of you had to die for this one to live.", symbol: "♥" },
+  { category: "Change", answer: "Endings are just beginnings in disguise.", symbol: "♥" },
+  { category: "Change", answer: "Stop watering dead flowers.", symbol: "♥" },
+  { category: "Change", answer: "What got you here won't get you there.", symbol: "♥" },
+  { category: "Change", answer: "The only constant is change. Ride it.", symbol: "♥" },
+  { category: "Change", answer: "Burn the ships. There's no going back.", symbol: "♥" },
+  { category: "Change", answer: "You're not lost. You're becoming.", symbol: "♥" },
+  { category: "Change", answer: "Transformation requires destruction first.", symbol: "♥" },
+
+  // Love (♥)
   { category: "Love", answer: "Open the door you keep pretending is locked.", symbol: "♥" },
+  { category: "Love", answer: "You are worthy of the love you give others.", symbol: "♥" },
+  { category: "Love", answer: "Stop looking for love where you lost it.", symbol: "♥" },
+  { category: "Love", answer: "Vulnerability is the birthplace of connection.", symbol: "♥" },
+  { category: "Love", answer: "Love the people in front of you. Now.", symbol: "♥" },
+  { category: "Love", answer: "You can't pour from an empty cup.", symbol: "♥" },
+  { category: "Love", answer: "Forgiveness is the first act of love.", symbol: "♥" },
+  { category: "Love", answer: "Let them see you. The real you.", symbol: "♥" },
+  { category: "Love", answer: "Love isn't found. It's built, daily.", symbol: "♥" },
+  { category: "Love", answer: "The walls you built to protect you are also keeping love out.", symbol: "♥" },
+
+  // Action (♠)
   { category: "Action", answer: "Stop planning. Start.", symbol: "♠" },
+  { category: "Action", answer: "Done is better than perfect.", symbol: "♠" },
+  { category: "Action", answer: "You don't need more information. You need to move.", symbol: "♠" },
+  { category: "Action", answer: "The first step doesn't need to be big. Just real.", symbol: "♠" },
+  { category: "Action", answer: "Overthinking is the enemy of action.", symbol: "♠" },
+  { category: "Action", answer: "Ship it. Fix it later.", symbol: "♠" },
+  { category: "Action", answer: "Your future self is begging you to start today.", symbol: "♠" },
+  { category: "Action", answer: "Motion creates motivation, not the other way around.", symbol: "♠" },
+  { category: "Action", answer: "Stop rehearsing. Go live.", symbol: "♠" },
+  { category: "Action", answer: "The world rewards action, not intention.", symbol: "♠" },
+
+  // Wisdom (♣)
   { category: "Wisdom", answer: "The teacher appears when the student is ready.", symbol: "♣" },
+  { category: "Wisdom", answer: "Knowledge speaks. Wisdom listens.", symbol: "♣" },
+  { category: "Wisdom", answer: "The wisest people ask the simplest questions.", symbol: "♣" },
+  { category: "Wisdom", answer: "Experience is what you get when you didn't get what you wanted.", symbol: "♣" },
+  { category: "Wisdom", answer: "Learn the rules first. Then break them.", symbol: "♣" },
+  { category: "Wisdom", answer: "Your mistakes are your best curriculum.", symbol: "♣" },
+  { category: "Wisdom", answer: "Be curious, not judgmental.", symbol: "♣" },
+  { category: "Wisdom", answer: "The answer you seek is in a book you haven't read.", symbol: "♣" },
+  { category: "Wisdom", answer: "Think for yourself. Everyone else is taken.", symbol: "♣" },
+  { category: "Wisdom", answer: "What would you do if you weren't afraid?", symbol: "♣" },
+
+  // Solitude (♦)
   { category: "Solitude", answer: "Being alone is not the same as being lonely.", symbol: "♦" },
+  { category: "Solitude", answer: "Your own company is a gift. Unwrap it.", symbol: "♦" },
+  { category: "Solitude", answer: "Silence is where the real answers live.", symbol: "♦" },
+  { category: "Solitude", answer: "You need less noise and more space.", symbol: "♦" },
+  { category: "Solitude", answer: "The crowd is going the wrong way. Walk alone.", symbol: "♦" },
+  { category: "Solitude", answer: "Solitude is not punishment. It's preparation.", symbol: "♦" },
+  { category: "Solitude", answer: "Withdraw. Recharge. Return stronger.", symbol: "♦" },
+  { category: "Solitude", answer: "Your best ideas come when you stop talking.", symbol: "♦" },
+  { category: "Solitude", answer: "Not every silence needs filling.", symbol: "♦" },
+  { category: "Solitude", answer: "Learn to sit with yourself. That's the work.", symbol: "♦" },
+
+  // Fate (♠)
   { category: "Fate", answer: "This was always going to happen.", symbol: "♠" },
+  { category: "Fate", answer: "You were meant to read this, right now.", symbol: "♠" },
+  { category: "Fate", answer: "There are no coincidences.", symbol: "♠" },
+  { category: "Fate", answer: "Trust the timing of your life.", symbol: "♠" },
+  { category: "Fate", answer: "You can't connect the dots looking forward.", symbol: "♠" },
+  { category: "Fate", answer: "Some doors close so better ones can open.", symbol: "♠" },
+  { category: "Fate", answer: "The universe has a plan. Relax.", symbol: "♠" },
+  { category: "Fate", answer: "What's yours will find you.", symbol: "♠" },
+  { category: "Fate", answer: "Every detour was actually the path.", symbol: "♠" },
+  { category: "Fate", answer: "You're exactly where you need to be.", symbol: "♠" },
+
+  // Hope (♥)
   { category: "Hope", answer: "The darkest hour is just before dawn.", symbol: "♥" },
+  { category: "Hope", answer: "This too shall pass.", symbol: "♥" },
+  { category: "Hope", answer: "After winter, always spring.", symbol: "♥" },
+  { category: "Hope", answer: "You have survived every bad day so far.", symbol: "♥" },
+  { category: "Hope", answer: "Light exists even in the darkest places.", symbol: "♥" },
+  { category: "Hope", answer: "Tomorrow is unwritten. Make it beautiful.", symbol: "♥" },
+  { category: "Hope", answer: "Hope is not naive. It's radical.", symbol: "♥" },
+  { category: "Hope", answer: "The seed in the dark doesn't know it's becoming a flower.", symbol: "♥" },
+  { category: "Hope", answer: "Something wonderful is about to happen.", symbol: "♥" },
+  { category: "Hope", answer: "Hold on. The tide is turning.", symbol: "♥" },
+
+  // Doubt (♣)
   { category: "Doubt", answer: "Your doubt is not protecting you — it is limiting you.", symbol: "♣" },
+  { category: "Doubt", answer: "The voice telling you that you can't is lying.", symbol: "♣" },
+  { category: "Doubt", answer: "Imposter syndrome means you're growing.", symbol: "♣" },
+  { category: "Doubt", answer: "You are more ready than you think.", symbol: "♣" },
+  { category: "Doubt", answer: "Doubt kills more dreams than failure ever will.", symbol: "♣" },
+  { category: "Doubt", answer: "Stop asking permission to be yourself.", symbol: "♣" },
+  { category: "Doubt", answer: "Confidence isn't knowing you'll succeed. It's knowing you'll survive.", symbol: "♣" },
+  { category: "Doubt", answer: "The expert was once a beginner.", symbol: "♣" },
+  { category: "Doubt", answer: "Question the doubt, not yourself.", symbol: "♣" },
+  { category: "Doubt", answer: "You don't need certainty. You need courage.", symbol: "♣" },
+
+  // Growth (♦)
   { category: "Growth", answer: "Discomfort is the price of a meaningful life.", symbol: "♦" },
+  { category: "Growth", answer: "You grow at the edge of your comfort zone.", symbol: "♦" },
+  { category: "Growth", answer: "The struggle is the lesson.", symbol: "♦" },
+  { category: "Growth", answer: "Feedback is a gift. Even when it stings.", symbol: "♦" },
+  { category: "Growth", answer: "Break the pattern or the pattern breaks you.", symbol: "♦" },
+  { category: "Growth", answer: "Who you were is not who you have to be.", symbol: "♦" },
+  { category: "Growth", answer: "Every failure is a data point.", symbol: "♦" },
+  { category: "Growth", answer: "Growing pains mean you're growing.", symbol: "♦" },
+  { category: "Growth", answer: "Compare yourself only to yesterday's you.", symbol: "♦" },
+  { category: "Growth", answer: "The butterfly cannot go back to being a caterpillar.", symbol: "♦" },
+
+  // Time (♠)
   { category: "Time", answer: "It's not too late. It's never too late.", symbol: "♠" },
+  { category: "Time", answer: "Time is the only thing you can't earn back.", symbol: "♠" },
+  { category: "Time", answer: "The best time to start was yesterday. The next best is now.", symbol: "♠" },
+  { category: "Time", answer: "Don't count the days. Make the days count.", symbol: "♠" },
+  { category: "Time", answer: "You have exactly enough time for what matters.", symbol: "♠" },
+  { category: "Time", answer: "Stop spending time on things that don't light you up.", symbol: "♠" },
+  { category: "Time", answer: "An hour of focus beats a day of distraction.", symbol: "♠" },
+  { category: "Time", answer: "Your future is built in the hours no one sees.", symbol: "♠" },
+  { category: "Time", answer: "Time reveals what intention conceals.", symbol: "♠" },
+  { category: "Time", answer: "One day or day one. You decide.", symbol: "♠" },
+
+  // Joy (♥)
   { category: "Joy", answer: "Happiness is not found. It is created.", symbol: "♥" },
+  { category: "Joy", answer: "Do more of what makes you forget to check your phone.", symbol: "♥" },
+  { category: "Joy", answer: "Joy is not the destination. It's the fuel.", symbol: "♥" },
+  { category: "Joy", answer: "Celebrate the small wins. They compound.", symbol: "♥" },
+  { category: "Joy", answer: "You're allowed to enjoy your life.", symbol: "♥" },
+  { category: "Joy", answer: "Play is not a waste of time. It's essential.", symbol: "♥" },
+  { category: "Joy", answer: "The things that make you laugh are telling you something.", symbol: "♥" },
+  { category: "Joy", answer: "Dance when no one's watching. And when they are.", symbol: "♥" },
+  { category: "Joy", answer: "Stop postponing happiness for achievement.", symbol: "♥" },
+  { category: "Joy", answer: "Find joy in the ordinary. That's where life lives.", symbol: "♥" },
+
+  // Focus (♣)
   { category: "Focus", answer: "Do less. But do it completely.", symbol: "♣" },
+  { category: "Focus", answer: "Distraction is the enemy of depth.", symbol: "♣" },
+  { category: "Focus", answer: "Say no to almost everything.", symbol: "♣" },
+  { category: "Focus", answer: "Attention is your most valuable resource.", symbol: "♣" },
+  { category: "Focus", answer: "Finish one thing before starting another.", symbol: "♣" },
+  { category: "Focus", answer: "The scatter ends today. Pick one thing.", symbol: "♣" },
+  { category: "Focus", answer: "Depth beats breadth. Always.", symbol: "♣" },
+  { category: "Focus", answer: "What you focus on expands.", symbol: "♣" },
+  { category: "Focus", answer: "Clear your desk. Clear your mind.", symbol: "♣" },
+  { category: "Focus", answer: "The noise will always be there. Tune it out.", symbol: "♣" },
+
+  // Release (♦)
   { category: "Release", answer: "Forgive them. Not for them — for you.", symbol: "♦" },
+  { category: "Release", answer: "Put it down. You've carried it long enough.", symbol: "♦" },
+  { category: "Release", answer: "Let go of the story you keep telling about yourself.", symbol: "♦" },
+  { category: "Release", answer: "Not every battle is yours to fight.", symbol: "♦" },
+  { category: "Release", answer: "Exhale. You've been holding your breath.", symbol: "♦" },
+  { category: "Release", answer: "Resentment is poison you drink hoping others suffer.", symbol: "♦" },
+  { category: "Release", answer: "You don't owe anyone an explanation.", symbol: "♦" },
+  { category: "Release", answer: "Drop the guilt. It's not helping.", symbol: "♦" },
+  { category: "Release", answer: "Stop carrying yesterday into today.", symbol: "♦" },
+  { category: "Release", answer: "Some things end so you can breathe again.", symbol: "♦" },
+
+  // Risk (♠)
   { category: "Risk", answer: "The biggest risk is not taking one.", symbol: "♠" },
+  { category: "Risk", answer: "Safe choices lead to average lives.", symbol: "♠" },
+  { category: "Risk", answer: "Bet on yourself. No one else will.", symbol: "♠" },
+  { category: "Risk", answer: "The cost of not trying is higher than failing.", symbol: "♠" },
+  { category: "Risk", answer: "Regret is worse than failure.", symbol: "♠" },
+  { category: "Risk", answer: "Fortune favors the bold.", symbol: "♠" },
+  { category: "Risk", answer: "If it doesn't scare you, it's not big enough.", symbol: "♠" },
+  { category: "Risk", answer: "Play to win, not to avoid losing.", symbol: "♠" },
+  { category: "Risk", answer: "The ship is safest in the harbor, but that's not what ships are for.", symbol: "♠" },
+  { category: "Risk", answer: "Take the shot. You miss 100% of the ones you don't.", symbol: "♠" },
+
+  // Rest (♥)
   { category: "Rest", answer: "You are not lazy. You are exhausted. Rest.", symbol: "♥" },
+  { category: "Rest", answer: "Rest is not the reward. It's the requirement.", symbol: "♥" },
+  { category: "Rest", answer: "Burnout is not a badge of honor.", symbol: "♥" },
+  { category: "Rest", answer: "You can't sprint a marathon.", symbol: "♥" },
+  { category: "Rest", answer: "Sleep on it. Literally.", symbol: "♥" },
+  { category: "Rest", answer: "Your body is keeping score. Listen to it.", symbol: "♥" },
+  { category: "Rest", answer: "The pause is part of the music.", symbol: "♥" },
+  { category: "Rest", answer: "Doing nothing is sometimes the most productive thing.", symbol: "♥" },
+  { category: "Rest", answer: "Recharge or break down. Those are your options.", symbol: "♥" },
+  { category: "Rest", answer: "Permission to stop. Granted.", symbol: "♥" },
+
+  // Connection (♣)
   { category: "Connection", answer: "Call the person you've been thinking about.", symbol: "♣" },
+  { category: "Connection", answer: "Show up for the people who show up for you.", symbol: "♣" },
+  { category: "Connection", answer: "Ask how they're really doing.", symbol: "♣" },
+  { category: "Connection", answer: "You need people. That's not weakness.", symbol: "♣" },
+  { category: "Connection", answer: "The text you're afraid to send? Send it.", symbol: "♣" },
+  { category: "Connection", answer: "Deep conversations heal more than therapy sometimes.", symbol: "♣" },
+  { category: "Connection", answer: "Quality over quantity. In everything, including people.", symbol: "♣" },
+  { category: "Connection", answer: "Be the friend you wish you had.", symbol: "♣" },
+  { category: "Connection", answer: "Presence is the greatest gift you can give.", symbol: "♣" },
+  { category: "Connection", answer: "Your tribe is out there. Keep looking.", symbol: "♣" },
+
+  // Clarity (♦)
   { category: "Clarity", answer: "Simplify. Then simplify again.", symbol: "♦" },
+  { category: "Clarity", answer: "Confusion is a sign you're overcomplicating it.", symbol: "♦" },
+  { category: "Clarity", answer: "Write it down. Clarity follows ink.", symbol: "♦" },
+  { category: "Clarity", answer: "Remove everything that isn't essential.", symbol: "♦" },
+  { category: "Clarity", answer: "When you can't decide, zoom out.", symbol: "♦" },
+  { category: "Clarity", answer: "The answer is usually the simpler one.", symbol: "♦" },
+  { category: "Clarity", answer: "Name the problem. That's half the solution.", symbol: "♦" },
+  { category: "Clarity", answer: "Stop thinking in circles. Decide and move.", symbol: "♦" },
+  { category: "Clarity", answer: "Less options, better choices.", symbol: "♦" },
+  { category: "Clarity", answer: "If you can't explain it simply, you don't understand it.", symbol: "♦" },
+
+  // Acceptance (♥)
   { category: "Acceptance", answer: "Let it be what it is.", symbol: "♥" },
+  { category: "Acceptance", answer: "Fighting reality never works.", symbol: "♥" },
+  { category: "Acceptance", answer: "You don't have to like it to accept it.", symbol: "♥" },
+  { category: "Acceptance", answer: "Some things aren't problems to solve. They're truths to accept.", symbol: "♥" },
+  { category: "Acceptance", answer: "Radical acceptance is radical freedom.", symbol: "♥" },
+  { category: "Acceptance", answer: "Stop arguing with what already happened.", symbol: "♥" },
+  { category: "Acceptance", answer: "Accept yourself first. Everything else follows.", symbol: "♥" },
+  { category: "Acceptance", answer: "Imperfection is not failure. It's human.", symbol: "♥" },
+  { category: "Acceptance", answer: "Not everything broken needs fixing.", symbol: "♥" },
+  { category: "Acceptance", answer: "Peace begins with acceptance.", symbol: "♥" },
+
+  // Ambition (♠)
   { category: "Ambition", answer: "Dream bigger. You're playing too small.", symbol: "♠" },
+  { category: "Ambition", answer: "Your ceiling is someone else's floor. Raise it.", symbol: "♠" },
+  { category: "Ambition", answer: "Aim for remarkable, not reasonable.", symbol: "♠" },
+  { category: "Ambition", answer: "Think 10x, not 10%.", symbol: "♠" },
+  { category: "Ambition", answer: "The world needs what only you can build.", symbol: "♠" },
+  { category: "Ambition", answer: "Small thinking is a choice. Choose differently.", symbol: "♠" },
+  { category: "Ambition", answer: "Hunger beats talent when talent isn't hungry.", symbol: "♠" },
+  { category: "Ambition", answer: "Set a goal that scares you and excites you equally.", symbol: "♠" },
+  { category: "Ambition", answer: "Your potential is not a fixed number.", symbol: "♠" },
+  { category: "Ambition", answer: "Outwork your doubt.", symbol: "♠" },
+
+  // Gratitude (♣)
   { category: "Gratitude", answer: "Look at what you have. Really look.", symbol: "♣" },
+  { category: "Gratitude", answer: "Gratitude turns what you have into enough.", symbol: "♣" },
+  { category: "Gratitude", answer: "Someone is praying for what you take for granted.", symbol: "♣" },
+  { category: "Gratitude", answer: "Thank the people who helped you get here.", symbol: "♣" },
+  { category: "Gratitude", answer: "The ordinary is extraordinary when you pay attention.", symbol: "♣" },
+  { category: "Gratitude", answer: "Name three things. Right now. Be grateful.", symbol: "♣" },
+  { category: "Gratitude", answer: "Abundance starts with appreciation.", symbol: "♣" },
+  { category: "Gratitude", answer: "Your worst day alive is still a day alive.", symbol: "♣" },
+  { category: "Gratitude", answer: "Gratitude is not passive. It's a practice.", symbol: "♣" },
+  { category: "Gratitude", answer: "You are richer than you realize.", symbol: "♣" },
+
+  // Mystery (♦)
   { category: "Mystery", answer: "Not everything needs to be understood.", symbol: "♦" },
+  { category: "Mystery", answer: "Embrace the unknown. That's where magic lives.", symbol: "♦" },
+  { category: "Mystery", answer: "Some questions are better than answers.", symbol: "♦" },
+  { category: "Mystery", answer: "The universe is under no obligation to make sense.", symbol: "♦" },
+  { category: "Mystery", answer: "Not knowing is not the same as being lost.", symbol: "♦" },
+  { category: "Mystery", answer: "Let it remain a mystery. Not everything needs solving.", symbol: "♦" },
+  { category: "Mystery", answer: "Wonder is the beginning of wisdom.", symbol: "♦" },
+  { category: "Mystery", answer: "The most interesting people are comfortable with ambiguity.", symbol: "♦" },
+  { category: "Mystery", answer: "Trust the process even when you can't see the path.", symbol: "♦" },
+  { category: "Mystery", answer: "Leave room for surprise.", symbol: "♦" },
 ];
+
+// Active deck — 24 randomly selected answers
+let ANSWERS = ALL_ANSWERS.slice(0, 24);
+
+function randomizeAnswers() {
+  // Fisher-Yates shuffle on a copy, pick first 24
+  const pool = [...ALL_ANSWERS];
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [pool[i], pool[j]] = [pool[j], pool[i]];
+  }
+  ANSWERS = pool.slice(0, 24);
+  // Update card fronts
+  cardEls.forEach((el, idx) => {
+    const a = ANSWERS[idx];
+    const sym = SYMBOLS[idx % SYMBOLS.length];
+    const front = el.querySelector('.card-front');
+    if (front) {
+      front.querySelector('.card-front-symbol').innerHTML = CATEGORY_ICONS[a.category] || sym;
+      front.querySelector('.card-category').textContent = a.category;
+      front.querySelector('.card-answer').textContent = `"${a.answer}"`;
+      const wm = front.querySelector('.card-watermark');
+      if (wm) {
+        wm.dataset.category = a.category;
+        const svg = CATEGORY_ICONS[a.category];
+        if (svg) wm.style.backgroundImage = `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+      }
+    }
+  });
+}
 
 const SYMBOLS = ["✦", "◈", "✧", "⬥", "❖", "☽", "✶", "⊕"];
 
@@ -1074,8 +1367,9 @@ shuffleBtn.addEventListener('click', () => {
     setTimeout(() => { siteIntro.style.display = 'none'; }, 1500);
   }
   if (pickedIndex >= 0) {
-    putBackCard(() => setTimeout(shuffleDeck, 200));
+    putBackCard(() => { randomizeAnswers(); setTimeout(shuffleDeck, 200); });
   } else {
+    randomizeAnswers();
     shuffleDeck();
   }
 });
