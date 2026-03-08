@@ -159,7 +159,7 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    padding: 16px;
+    padding: 8px;
   }
   .card-back-orange {
     background-color: var(--accent);
@@ -637,6 +637,8 @@ function createCardEl(index) {
   `;
 
   wrapper.addEventListener('click', () => onCardClick(index));
+  wrapper.addEventListener('mouseenter', () => { orbitHovering = true; });
+  wrapper.addEventListener('mouseleave', () => { orbitHovering = false; });
 
   // Set watermark background from category icon SVG
   const wm = wrapper.querySelector('.card-watermark');
@@ -849,6 +851,8 @@ function doRiffles(count, total, callback) {
 let orbitAngle = 0; // current rotation in radians
 let orbitRAF = null;
 const ORBIT_SPEED = 0.12; // radians per second — slow, meditative
+const ORBIT_SPEED_HOVER = 0.02; // much slower when hovering cards
+let orbitHovering = false;
 
 function getOrbitParams() {
   const w = window.innerWidth;
@@ -912,7 +916,7 @@ function startOrbit() {
     if (state !== 'fanned') return;
     const dt = (now - lastTime) / 1000;
     lastTime = now;
-    orbitAngle += dt * ORBIT_SPEED;
+    orbitAngle += dt * (orbitHovering ? ORBIT_SPEED_HOVER : ORBIT_SPEED);
 
     const params = getOrbitParams();
     cardEls.forEach((el, i) => {
