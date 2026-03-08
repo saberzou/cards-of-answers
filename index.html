@@ -869,12 +869,12 @@ function cardOrbitPos(order, n, angle, params) {
   // Pear-shaped orbit: rx grows when card is at front (sin > 0)
   // This widens the arc at the bottom, spacing front cards apart naturally
   const frontness = Math.max(0, Math.sin(theta)); // 0 at back, 1 at front center
-  const BULGE = 0.35; // how much wider the front arc is (35% extra radius)
+  const BULGE = 0.8; // how much wider the front arc is (80% extra radius)
   const rx = params.rx * (1 + frontness * BULGE);
   const x = params.cx + Math.cos(theta) * rx;
   const y = params.cy + Math.sin(theta) * params.ry;
   const depth = Math.sin(theta);
-  const scale = 0.75 + depth * 0.25;
+  const scale = 0.7 + depth * 0.3;
   const rot = Math.cos(theta) * -6;
   const z = Math.round((depth + 1) * 500);
   return { x, y, scale, rot, z, depth };
