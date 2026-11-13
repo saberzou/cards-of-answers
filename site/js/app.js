@@ -325,6 +325,7 @@ function lockDeck() {
 function restCopy() {
   title.className = "apron-title";
   title.textContent = "Hold your question.";
+  delete title.dataset.length;
   titleSlot.appendChild(title);
   hint.hidden = false;
   hint.textContent = "Press and hold the deck for one breath.";
@@ -346,6 +347,7 @@ function openDeck() {
   body.dataset.mode = "spread";
   title.className = "apron-title";
   title.textContent = "Choose one.";
+  delete title.dataset.length;
   titleSlot.appendChild(title);
   hint.hidden = false;
   hint.textContent = "Each one holds a different answer.";
@@ -384,6 +386,7 @@ function showReading(pick, options = {}) {
   readingImg.src = imageSrc(pick.category);
   readingImg.alt = `Illustration for ${pick.category}`;
   title.className = "reading-title";
+  title.dataset.length = pick.text.length > 52 ? "long" : pick.text.length > 32 ? "mid" : "short";
   title.textContent = pick.text;
   title.tabIndex = -1;
   readingCopy.insertBefore(title, readingCat);
@@ -419,6 +422,7 @@ function backToDeck() {
   reading.hidden = true;
   title.className = "apron-title";
   title.textContent = "Choose one.";
+  delete title.dataset.length;
   title.removeAttribute("tabindex");
   titleSlot.appendChild(title);
   hint.hidden = false;
