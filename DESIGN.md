@@ -60,7 +60,7 @@ rounded:
   picture: "10px"
   pill: "999px"
   lamp: "50%"
-  arch: "120px 120px 20px 20px / 64px 64px 20px 20px"
+  frame: "clamp(18px, 1.5vw, 28px), the same circular radius on all four corners"
   stage: "80px 80px 8px 8px / 36px 36px 8px 8px"
 spacing:
   xs: "8px"
@@ -119,7 +119,7 @@ components:
     backgroundColor: "{colors.plum-deep}"
     textColor: "{colors.paper}"
     typography: "{typography.title}"
-    rounded: "{rounded.arch}"
+    rounded: "{rounded.frame}"
     width: "min(1120px, 100%)"
   kept-card:
     backgroundColor: "{colors.plum}"
@@ -248,13 +248,13 @@ Depth is a stack of tones plus a soft cast. The field is plum, with a fractal-no
 
 ## Shapes
 
-The page is cut as an arch. The proscenium radius is `120px 120px 20px 20px / 64px 64px 20px 20px`, inside a 12px vermilion border. Below 720px the border is 8px and the radius is `72px 72px 16px 16px / 36px 36px 16px 16px`. The stage opening repeats the arch smaller: `80px 80px 8px 8px / 36px 36px 8px 8px`, and `48px 48px 8px 8px / 24px 24px 8px 8px` when narrow.
+The proscenium is a rounded rectangle, not an arch. Every corner uses the same circular radius, `clamp(18px, 1.5vw, 28px)` inside a 12px vermilion border, and `18px` when the viewport is under 720px wide with an 8px border. A percentage or elliptical radius is not used, because it stretches on a wide or tall frame. The stage opening is a smaller even radius, `16px`, or `12px` when narrow.
 
 Cards are portrait, 140×196 on the wide stage and 96×134 below 720px, with 12px corners (the picture files are 5:7 and cover the face). The apron matches the card’s 12px. The press target is an invisible rounded rectangle at 18px. The reading sheet is 16px, 14px when it stacks, and the picture inside it is 10px. Controls are pills. Lamps are 14px circles, 10px apart (8px when narrow). The kept PNG does not take the arch. Its corners are square.
 
 ### Named Rules
 
-**The Arch Rule.** The proscenium and the stage opening are elliptical arches, tall across the top and short along the bottom. Cards, the reading sheet, and the apron use small even corners. Controls are pills. Lamps are circles. The shared image stays a sharp rectangle.
+**The Frame Rule.** The proscenium and the stage opening use one circular radius on all four corners. The radius may change with the viewport, and it stays the same on every corner. Cards, the reading sheet, and the apron use small even corners. Controls are pills. Lamps are circles. The shared image stays a sharp rectangle.
 
 ## Components
 
@@ -272,7 +272,7 @@ Filled, quiet, and text. All three use Anybody at the control size, a pill radiu
 
 The closed stage shows three covers in a fan. Each card is a button, 140×196 (96×134 below 720px), picture cropped to cover, 12px corners, cream behind the picture, and the card shadow. Focus is a 2px cream ring, offset 4px, on a 14px radius. In the orbit, a fine pointer slows the turn to 0.22×, and keyboard focus slows it to 0.4×. Choosing a card opens the reading sheet. The picture and the sentence belong together.
 
-The reading sheet is cream, ink type, 16px corners, the reading shadow, inset from the stage. It arrives in 0.55s with `cubic-bezier(0.16, 0.84, 0.24, 1)`, from 16px down, scale 0.98, and 8px of blur. The picture column is 42%, the image contained with 10px corners and inset 16px 10px 16px 16px. The copy column stacks the answer, then the category in violet deep, then the date note when the card is today’s. Below 720px the sheet is a column, radius 14px, picture on top.
+The reading sheet is cream, ink type, 16px corners, the reading shadow, inset from the stage. It arrives in 0.55s with `cubic-bezier(0.16, 0.84, 0.24, 1)`, from 16px down, scale 0.98, and 8px of blur. The picture and the sentence are centered as a pair. The picture keeps the card’s 5:7 proportion, up to 520px tall. The answer is Petrona at `clamp(2.2rem, 3.8vw, 3.7rem)`, and the category sits under it in Anybody, violet deep. Below 720px the sheet is a column, radius 14px, picture on top, answer at `clamp(1.75rem, 7.6vw, 2.2rem)`. On a short phone the picture is capped so the category stays on the sheet. The four actions share one pill, one height, and one row or a two-by-two grid. Only Keep this card is filled.
 
 The apron is the cream band under the stage: 12px corners, padding 16px 18px 12px, centered. It holds the stage direction, the instruction, the lamps, the controls, the status line, and Today’s card, in that order. Lamps and controls hide and return with the mode. The apron does not scroll away from the theater.
 
@@ -282,7 +282,7 @@ Seven 14px circles in a row, gap 10px, a 14px margin above the row. Unlit, they 
 
 ### Proscenium
 
-The theater is the page. Plum deep ground, 12px vermilion border, the arch radius, the theater shadow, and the ink hairline inside the frame. The wordmark is centered in the arch. The stage is the cavity, with its own smaller arch and inset shadow, and it clips the curtain and the cards. Each curtain half is seven pleats. Opening and reading move the halves 104% outward in 0.85s with `cubic-bezier(0.77, 0, 0.18, 1)`. Reduced motion cuts that transition, so the curtain changes place without traveling. Forced colors redraw the frame as CanvasText, the lit lamp as Highlight, and the paper surfaces as Canvas.
+The theater is the page. Plum deep ground, 12px vermilion border, the even frame radius, the theater shadow, and the ink hairline inside the frame. The wordmark is centered in the top of the frame. The stage is the cavity, with its own smaller even radius and inset shadow, and it clips the curtain and the cards. Each curtain half is seven pleats. Opening and reading move the halves 104% outward in 0.85s with `cubic-bezier(0.77, 0, 0.18, 1)`. Reduced motion cuts that transition, so the curtain changes place without traveling. Forced colors redraw the frame as CanvasText, the lit lamp as Highlight, and the paper surfaces as Canvas.
 
 ### Kept card
 
