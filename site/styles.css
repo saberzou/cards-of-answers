@@ -203,7 +203,7 @@ html {
   border: 0;
   background: transparent;
   cursor: pointer;
-  touch-action: none;
+  touch-action: manipulation;
   transform-style: preserve-3d;
 }
 

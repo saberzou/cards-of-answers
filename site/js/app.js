@@ -808,8 +808,30 @@ function keepAnswerSelectable(event) {
   return Boolean(event.target.closest && event.target.closest(".reading-title"));
 }
 
+function cardFromPoint(x, y) {
+  const stack = document.elementsFromPoint(x, y);
+  for (const node of stack) {
+    const card = node.closest && node.closest(".card");
+    if (card) return card;
+  }
+  let best = null;
+  let bestZ = -1;
+  cards.forEach((card) => {
+    const rect = card.getBoundingClientRect();
+    const z = Number(card.style.zIndex) || 0;
+    if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom && z >= bestZ) {
+      best = card;
+      bestZ = z;
+    }
+  });
+  return best;
+}
+
 theater.addEventListener("touchstart", (event) => {
   if (keepAnswerSelectable(event)) return;
+  const target = event.target;
+  if (target.closest && target.closest("#today, .actions button, .card")) return;
+  if (state.mode === "spread" || state.mode === "lift" || state.mode === "reading") return;
   event.preventDefault();
 }, { passive: false, capture: true });
 theater.addEventListener("contextmenu", (event) => {
@@ -822,6 +844,29 @@ document.addEventListener("selectstart", (event) => {
 });
 document.addEventListener("dragstart", (event) => {
   if (event.target.closest && event.target.closest("img")) event.preventDefault();
+});
+
+let spreadTouch = null;
+
+stage.addEventListener("pointerdown", (event) => {
+  if (state.mode !== "spread" || !state.settled) return;
+  if (event.pointerType === "mouse" && event.button !== 0) return;
+  spreadTouch = { id: event.pointerId, x: event.clientX, y: event.clientY };
+});
+
+stage.addEventListener("pointerup", (event) => {
+  if (!spreadTouch || spreadTouch.id !== event.pointerId) return;
+  const start = spreadTouch;
+  spreadTouch = null;
+  if (state.mode !== "spread" || !state.settled) return;
+  if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 22) return;
+  const card = cardFromPoint(event.clientX, event.clientY);
+  if (!card) return;
+  choose(Number(card.dataset.index));
+});
+
+stage.addEventListener("pointercancel", () => {
+  spreadTouch = null;
 });
 
 stage.addEventListener("pointermove", (event) => {
