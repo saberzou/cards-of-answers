@@ -34,6 +34,13 @@
 
 * { box-sizing: border-box; }
 
+html, body, .theater, .wordmark, .stage, .apron, .hint, .apron-title, .card, .hold, .reading-cat, .reading-note, .actions, .today, .status {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
 html, body {
   margin: 0;
   height: 100%;
@@ -130,6 +137,9 @@ html {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: inset 0 16px 36px rgba(0, 0, 0, 0.35);
+  perspective: 1200px;
+  perspective-origin: 50% 40%;
+  touch-action: manipulation;
 }
 
 .curtain {
@@ -157,7 +167,8 @@ html {
 .curtain-panel span:nth-child(3n + 1) { background: #6d3eae; }
 
 [data-mode="reading"] .company {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 [data-mode="reading"] .curtain {
@@ -178,6 +189,7 @@ html {
   position: absolute;
   inset: 0;
   z-index: 3;
+  transform-style: preserve-3d;
 }
 
 .card {
@@ -191,18 +203,50 @@ html {
   border: 0;
   background: transparent;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  touch-action: manipulation;
+  touch-action: none;
+  transform-style: preserve-3d;
 }
 
-.card img {
+.hinge {
+  position: absolute;
+  inset: 0;
+  display: block;
+  transform-style: preserve-3d;
+  transition: transform 0.72s cubic-bezier(0.18, 0.84, 0.22, 1);
+}
+
+.card.is-turning .hinge {
+  transform: rotateY(180deg);
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 12px;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--paper);
+  box-shadow: 0 16px 28px rgba(8, 4, 10, 0.4);
+}
+
+.face.front {
+  transform: rotateY(180deg);
+}
+
+.card.is-chosen .face {
+  box-shadow:
+    0 30px 46px rgba(8, 4, 12, 0.5),
+    0 0 0 1px rgba(255, 228, 190, 0.55);
+}
+
+.face img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 12px;
-  box-shadow: 0 14px 26px rgba(8, 4, 10, 0.42);
-  background: var(--paper);
   pointer-events: none;
+  -webkit-user-drag: none;
 }
 
 .card:focus-visible {
@@ -252,7 +296,19 @@ html {
   border-radius: 0;
   overflow: auto;
   box-shadow: none;
-  animation: arrive 0.55s cubic-bezier(0.16, 0.84, 0.24, 1) both;
+}
+
+.reading.is-arriving {
+  animation: sheet-in 0.42s ease both;
+}
+
+.reading.is-arriving .reading-title {
+  animation: settle-type 0.6s 0.08s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.reading.is-arriving .reading-cat,
+.reading.is-arriving .reading-note {
+  animation: settle-type 0.5s 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .reading[hidden] { display: none; }
@@ -472,17 +528,14 @@ html {
   font-family: Petrona, Georgia, serif;
 }
 
-@keyframes arrive {
-  from {
-    opacity: 0;
-    transform: translateY(16px) scale(0.98);
-    filter: blur(8px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-    filter: none;
-  }
+@keyframes sheet-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes settle-type {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: none; }
 }
 
 @media (max-width: 720px) {
@@ -579,7 +632,11 @@ html {
 }
 
 body.is-reduced .curtain-panel,
-body.is-reduced .reading {
+body.is-reduced .reading,
+body.is-reduced .hinge,
+body.is-reduced .reading-title,
+body.is-reduced .reading-cat,
+body.is-reduced .reading-note {
   transition: none;
   animation: none;
 }
@@ -632,7 +689,11 @@ body.is-reduced[data-mode="spread"] .card img {
 
 @media (prefers-reduced-motion: reduce) {
   .curtain-panel,
-  .reading {
+  .reading,
+  .hinge,
+  .reading-title,
+  .reading-cat,
+  .reading-note {
     transition: none;
     animation: none;
   }

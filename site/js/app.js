@@ -5,6 +5,8 @@ const LAMP_COUNT = 7;
 const COVERS = ["Love", "Courage", "Hope"];
 
 const body = document.body;
+const theater = document.querySelector(".theater");
+const stage = document.getElementById("stage");
 const company = document.getElementById("company");
 const holdBtn = document.getElementById("hold");
 const title = document.getElementById("apron-title");
@@ -157,15 +159,24 @@ function buildCards() {
     button.dataset.index = String(index);
     button.tabIndex = -1;
     button.setAttribute("aria-label", category);
-    const img = document.createElement("img");
-    img.alt = "";
-    img.width = 300;
-    img.height = 420;
-    img.src = imageSrc(category);
-    img.decoding = "async";
-    if (COVERS.includes(category)) img.setAttribute("fetchpriority", "high");
-    button.appendChild(img);
-    button.pose = { x: 0, y: 0, scale: 1, rot: 0, vx: 0, vy: 0, vscale: 0, vrot: 0, z: 1 };
+    const hinge = document.createElement("span");
+    hinge.className = "hinge";
+    ["back", "front"].forEach((side) => {
+      const face = document.createElement("span");
+      face.className = `face ${side}`;
+      const img = document.createElement("img");
+      img.alt = "";
+      img.width = 300;
+      img.height = 420;
+      img.src = imageSrc(category);
+      img.decoding = "async";
+      img.draggable = false;
+      if (side === "back" && COVERS.includes(category)) img.setAttribute("fetchpriority", "high");
+      face.appendChild(img);
+      hinge.appendChild(face);
+    });
+    button.appendChild(hinge);
+    button.pose = { x: 0, y: 0, scale: 1, rot: 0, tilt: 0, zDepth: 0, dim: 1, vx: 0, vy: 0, vscale: 0, vrot: 0, z: 1 };
     button.addEventListener("click", () => choose(index));
     button.addEventListener("pointerenter", () => preview(category));
     button.addEventListener("focus", () => preview(category));
@@ -206,9 +217,12 @@ function ellipseTarget(index, angle) {
   return {
     x,
     y,
-    scale: narrow ? 0.78 + front * 0.28 : 0.6 + front * 0.48,
+    scale: narrow ? 0.72 + front * 0.4 : 0.55 + front * 0.62,
     rot: 0,
-    z: 5 + Math.round(front * 60),
+    tilt: (0.5 - front) * 26,
+    zDepth: (front - 0.42) * 200,
+    dim: 0.38 + front * 0.62,
+    z: 5 + Math.round(front * 80),
   };
 }
 
@@ -219,8 +233,21 @@ function targetFor(index) {
 
 function applyPose(card) {
   const pose = card.pose;
-  card.style.transform = `translate(-50%, -50%) translate(${pose.x}px, ${pose.y}px) rotate(${pose.rot}deg) scale(${pose.scale})`;
+  const depth = pose.zDepth || 0;
+  const tilt = pose.tilt || 0;
+  card.style.opacity = String(pose.dim == null ? 1 : pose.dim);
+  card.style.transform = `translate(-50%, -50%) translate3d(${pose.x}px, ${pose.y}px, ${depth}px) rotateX(${tilt}deg) rotate(${pose.rot}deg) scale(${pose.scale})`;
   card.style.zIndex = String(pose.z);
+}
+
+function applyParallax() {
+  if (state.reduced || (state.mode !== "spread" && state.mode !== "lift")) {
+    if (state.mode !== "rest") company.style.transform = "";
+    return;
+  }
+  const x = state.parallaxX || 0;
+  const y = state.parallaxY || 0;
+  company.style.transform = `rotateX(${14 + y}deg) rotateY(${x}deg)`;
 }
 
 function placeImmediate() {
@@ -230,6 +257,9 @@ function placeImmediate() {
     card.pose.y = target.y;
     card.pose.scale = target.scale;
     card.pose.rot = target.rot;
+    card.pose.tilt = target.tilt || 0;
+    card.pose.zDepth = target.zDepth || 0;
+    card.pose.dim = target.dim == null ? 1 : target.dim;
     card.pose.z = target.z;
     card.pose.vx = card.pose.vy = card.pose.vscale = card.pose.vrot = 0;
     applyPose(card);
@@ -237,8 +267,8 @@ function placeImmediate() {
 }
 
 function stepSpring(dt) {
-  const stiffness = 92;
-  const damping = 15;
+  const stiffness = 74;
+  const damping = 11;
   let energy = 0;
   cards.forEach((card, index) => {
     const target = targetFor(index);
@@ -255,6 +285,9 @@ function stepSpring(dt) {
       pose[key] += pose[velocity] * dt;
       energy += Math.abs(pose[velocity]) + Math.abs(target[key] - pose[key]);
     });
+    pose.tilt = target.tilt || 0;
+    pose.zDepth = target.zDepth || 0;
+    pose.dim = target.dim == null ? 1 : target.dim;
     pose.z = target.z;
     applyPose(card);
   });
@@ -271,15 +304,48 @@ function frame(now) {
       Object.assign(card.pose, target, { vx: 0, vy: 0, vscale: 0, vrot: 0 });
       applyPose(card);
     });
+    applyParallax();
   } else if (state.phase === "spring") {
     const energy = stepSpring(dt);
-    if (energy < 18) {
+    applyParallax();
+    if (energy < 22) {
       state.phase = "orbit";
       state.settled = true;
       unlockDeck();
     }
+  } else if (state.phase === "lift") {
+    stepLift(dt);
+    applyParallax();
   }
-  if (state.mode === "spread" && !state.reduced) raf = requestAnimationFrame(frame);
+  if ((state.mode === "spread" || state.mode === "lift") && !state.reduced) {
+    raf = requestAnimationFrame(frame);
+  }
+}
+
+function stepLift(dt) {
+  const stiffness = 86;
+  const damping = 14;
+  cards.forEach((card) => {
+    const pose = card.pose;
+    if (card.classList.contains("is-chosen")) {
+      const goal = card.liftGoal;
+      ["x", "y", "scale"].forEach((key) => {
+        const velocity = `v${key === "scale" ? "scale" : key}`;
+        const acc = (goal[key] - pose[key]) * stiffness - pose[velocity] * damping;
+        pose[velocity] += acc * dt;
+        pose[key] += pose[velocity] * dt;
+      });
+      pose.zDepth += (goal.zDepth - pose.zDepth) * Math.min(1, dt * 6);
+      pose.tilt += ((goal.tilt || 0) - (pose.tilt || 0)) * Math.min(1, dt * 6);
+      pose.dim = 1;
+      pose.z = 200;
+    } else {
+      pose.dim = Math.max(0, (pose.dim == null ? 1 : pose.dim) - dt * 1.8);
+      pose.zDepth -= dt * 220;
+      pose.scale *= 1 - dt * 0.35;
+    }
+    applyPose(card);
+  });
 }
 
 function startLoop() {
@@ -334,6 +400,7 @@ function restCopy() {
   todayBtn.hidden = false;
   statusEl.textContent = "";
   reading.hidden = true;
+  reading.classList.remove("is-arriving");
   readingNote.hidden = true;
   paintLamps(0);
 }
@@ -365,6 +432,18 @@ function openDeck() {
   }
   state.phase = "spring";
   state.angle = -Math.PI / 2;
+  cards.forEach((card, index) => {
+    const target = ellipseTarget(index, state.angle);
+    const len = Math.hypot(target.x, target.y) || 1;
+    card.pose.x = 0;
+    card.pose.y = 0;
+    card.pose.scale = 0.45;
+    card.pose.vx = (target.x / len) * 1280;
+    card.pose.vy = (target.y / len) * 1280;
+    card.pose.vscale = 1.6;
+    card.style.opacity = "1";
+    card.classList.remove("is-chosen", "is-turning");
+  });
   lockDeck();
   startLoop();
   window.setTimeout(() => {
@@ -383,6 +462,7 @@ function showReading(pick, options = {}) {
   stopLoop();
   lockDeck();
   reading.hidden = false;
+  reading.classList.toggle("is-arriving", !state.reduced);
   readingImg.src = imageSrc(pick.category);
   readingImg.alt = `Illustration for ${pick.category}`;
   title.className = "reading-title";
@@ -416,6 +496,7 @@ function backToDeck() {
     state.deck = drawDeck();
     state.dealt = true;
   }
+  resetFlight();
   state.mode = "spread";
   state.pick = null;
   body.dataset.mode = "spread";
@@ -460,6 +541,14 @@ function askAgain() {
   holdBtn.focus();
 }
 
+function resetFlight() {
+  cards.forEach((card) => {
+    card.classList.remove("is-chosen", "is-turning");
+    card.liftGoal = null;
+    if (card.pose) card.pose.dim = 1;
+  });
+}
+
 function choose(index) {
   if (state.mode !== "spread") return;
   if (!state.reduced && !state.settled) return;
@@ -467,7 +556,37 @@ function choose(index) {
   if (!pick) return;
   state.roving = index;
   if (navigator.vibrate) navigator.vibrate(10);
-  showReading(pick);
+  if (state.reduced) {
+    showReading(pick);
+    return;
+  }
+  flyCard(index, pick);
+}
+
+function flyCard(index, pick) {
+  const card = cards[index];
+  state.mode = "lift";
+  state.phase = "lift";
+  body.dataset.mode = "lift";
+  card.classList.add("is-chosen");
+  const stageH = stage.clientHeight || 420;
+  const cardH = card.offsetHeight || 196;
+  card.liftGoal = {
+    x: 0,
+    y: 6,
+    scale: Math.min(1.85, (stageH * 0.62) / cardH),
+    zDepth: Math.min(90, stageH * 0.12),
+    tilt: 0,
+  };
+  lockDeck();
+  startLoop();
+  window.setTimeout(() => {
+    if (state.mode === "lift") card.classList.add("is-turning");
+  }, 420);
+  window.setTimeout(() => {
+    if (state.mode !== "lift") return;
+    showReading(pick);
+  }, 1020);
 }
 
 function beginHold() {
@@ -685,6 +804,37 @@ function syncReduced() {
   }
 }
 
+function keepAnswerSelectable(event) {
+  return Boolean(event.target.closest && event.target.closest(".reading-title"));
+}
+
+theater.addEventListener("touchstart", (event) => {
+  if (keepAnswerSelectable(event)) return;
+  event.preventDefault();
+}, { passive: false, capture: true });
+theater.addEventListener("contextmenu", (event) => {
+  if (keepAnswerSelectable(event)) return;
+  event.preventDefault();
+});
+document.addEventListener("selectstart", (event) => {
+  if (keepAnswerSelectable(event)) return;
+  event.preventDefault();
+});
+document.addEventListener("dragstart", (event) => {
+  if (event.target.closest && event.target.closest("img")) event.preventDefault();
+});
+
+stage.addEventListener("pointermove", (event) => {
+  if (state.reduced || (state.mode !== "spread" && state.mode !== "lift")) return;
+  const rect = stage.getBoundingClientRect();
+  state.parallaxX = ((event.clientX - rect.left) / rect.width - 0.5) * 14;
+  state.parallaxY = ((event.clientY - rect.top) / rect.height - 0.5) * -8;
+});
+stage.addEventListener("pointerleave", () => {
+  state.parallaxX = 0;
+  state.parallaxY = 0;
+});
+
 holdBtn.addEventListener("pointerdown", (event) => {
   if (event.button !== 0) return;
   state.lastInput = "pointer";
@@ -762,7 +912,7 @@ window.addEventListener("resize", () => {
 });
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) stopLoop();
-  else if (state.mode === "spread" && !state.reduced) startLoop();
+  else if ((state.mode === "spread" || state.mode === "lift") && !state.reduced) startLoop();
 });
 
 buildLamps();
